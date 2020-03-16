@@ -9,7 +9,7 @@
 //	+ regular map (in SBBs), not compressed, 32x32 
 //	Total size: 512 + 192 + 2048 = 2752
 //
-//	Time-stamp: 2020-03-16, 15:04:26
+//	Time-stamp: 2020-03-16, 18:06:45
 //	Exported by Cearn's Usenti v1.7.7
 //	(comments, kudos, flames to "daytshen@hotmail.com")
 //
