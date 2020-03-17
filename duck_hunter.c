@@ -93,12 +93,12 @@ void obj_test()
 			
 		}
 		if(key_hit(KEY_A)) {
-			by[0]=hy;
-			bx[0]=hx;
+			by[0]=hy-5;
+			bx[0]=hx+25;
 		}
 		if(key_hit(KEY_B)) {
-			by[1]=hy;
-			bx[1]=hx;
+			by[1]=hy-5;
+			bx[1]=hx+25;
 		}
 		
 		// make it glow (via palette swapping)
