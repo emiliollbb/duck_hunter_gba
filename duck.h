@@ -8,21 +8,21 @@
 //	+ 16 tiles not compressed
 //	Total size: 512 + 512 = 1024
 //
-//	Time-stamp: 2020-03-17, 12:11:09
-//	Exported by Cearn's GBA Image Transmogrifier, v0.8.3
-//	( http://www.coranac.com/projects/#grit )
+//	Time-stamp: 2020-03-17, 12:59:00
+//	Exported by Cearn's Usenti v1.7.7
+//	(comments, kudos, flames to "daytshen@hotmail.com")
 //
 //======================================================================
 
-#ifndef GRIT_DUCK_H
-#define GRIT_DUCK_H
-
-#define duckTilesLen 512
-extern const unsigned short duckTiles[256];
+#ifndef __DUCK__
+#define __DUCK__
 
 #define duckPalLen 512
 extern const unsigned short duckPal[256];
 
-#endif // GRIT_DUCK_H
+#define duckTilesLen 512
+extern const unsigned short duckTiles[256];
+
+#endif // __DUCK__
 
 //}}BLOCK(duck)
