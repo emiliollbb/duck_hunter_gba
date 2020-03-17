@@ -22,7 +22,7 @@ OBJ_AFFINE *obj_aff_buffer= (OBJ_AFFINE*)obj_buffer;
 // L & R shift starting tile
 void obj_test()
 {
-	int x= 96, y= 32;
+	int x= 96, y= 32, hx=0, hy=160-32-32;
 	u32 tid= 0, pb= 0;		// tile id, pal-bank
 
 	OBJ_ATTR *metr= &obj_buffer[0];
@@ -43,7 +43,7 @@ void obj_test()
 	// position sprite (redundant here; the _real_ position
 	// is set further down
 	obj_set_pos(metr, x, y);
-	obj_set_pos(hunter, 50, 50);
+	obj_set_pos(hunter, hx, hy);
 
 	while(1)
 	{
@@ -51,10 +51,10 @@ void obj_test()
 		key_poll();
 
 		// move left/right
-		x += 2*key_tri_horz();
+		hx += 2*key_tri_horz();
 
 		// move up/down
-		y += 2*key_tri_vert();
+		//hy += 2*key_tri_vert();
 
 		// increment/decrement starting tile with R/L
 		tid += bit_tribool(key_hit(-1), KI_R, KI_L);
@@ -75,6 +75,8 @@ void obj_test()
 		// Hey look, it's one of them build macros!
 		metr->attr2= ATTR2_BUILD(tid, pb, 0);
 		obj_set_pos(metr, x, y);
+		
+		obj_set_pos(hunter, hx, hy);
 
 		oam_copy(oam_mem, obj_buffer, 2);	// only need to update one
 	}
