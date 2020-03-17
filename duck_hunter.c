@@ -54,6 +54,7 @@ void obj_test()
 
 		// move left/right
 		hx += 2*key_tri_horz();
+		if(frame%2) x++;
 
 		// move up/down
 		//hy += 2*key_tri_vert();
