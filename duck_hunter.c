@@ -26,15 +26,24 @@ void obj_test()
 	u32 tid= 0, pb= 0;		// tile id, pal-bank
 
 	OBJ_ATTR *metr= &obj_buffer[0];
+	OBJ_ATTR *hunter= &obj_buffer[1];
 	obj_set_attr(metr, 
 		ATTR0_SQUARE,				// Square, regular sprite
 		//ATTR1_SIZE_64,					// 64x64p, 
 		ATTR1_SIZE_32,					// duck is 32x32p, 
 		ATTR2_PALBANK(pb) | tid);		// palbank 0, tile 0
 
+	
+	obj_set_attr(hunter, 
+		ATTR0_SQUARE,
+		ATTR1_SIZE_32,
+		ATTR2_PALBANK(0) | (16*3));		// palbank 0, tile 0
+
+
 	// position sprite (redundant here; the _real_ position
 	// is set further down
 	obj_set_pos(metr, x, y);
+	obj_set_pos(hunter, 50, 50);
 
 	while(1)
 	{
@@ -67,7 +76,7 @@ void obj_test()
 		metr->attr2= ATTR2_BUILD(tid, pb, 0);
 		obj_set_pos(metr, x, y);
 
-		oam_copy(oam_mem, obj_buffer, 1);	// only need to update one
+		oam_copy(oam_mem, obj_buffer, 2);	// only need to update one
 	}
 }
 
@@ -83,8 +92,8 @@ int main()
 	
 	
 	// Load ducks sprites
-	memcpy(&tile_mem[4][0], duckTiles, duckTilesLen);
 	memcpy(pal_obj_mem, duckPal, duckPalLen);
+	memcpy(&tile_mem[4][0], duckTiles, duckTilesLen);
 
 	oam_init(obj_buffer, 128);
 	

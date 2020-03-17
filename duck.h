@@ -3,12 +3,12 @@
 
 //======================================================================
 //
-//	duck, 32x32@4, 
+//	duck, 128x32@4, 
 //	+ palette 256 entries, not compressed
-//	+ 16 tiles not compressed
-//	Total size: 512 + 512 = 1024
+//	+ 64 tiles 4x4 metatiles not compressed
+//	Total size: 512 + 2048 = 2560
 //
-//	Time-stamp: 2020-03-17, 13:35:46
+//	Time-stamp: 2020-03-17, 16:45:59
 //	Exported by Cearn's Usenti v1.7.7
 //	(comments, kudos, flames to "daytshen@hotmail.com")
 //
@@ -20,8 +20,8 @@
 #define duckPalLen 512
 extern const unsigned short duckPal[256];
 
-#define duckTilesLen 512
-extern const unsigned short duckTiles[256];
+#define duckTilesLen 2048
+extern const unsigned short duckTiles[1024];
 
 #endif // __DUCK__
 
