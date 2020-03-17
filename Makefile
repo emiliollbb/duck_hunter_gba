@@ -14,7 +14,7 @@ PATH := $(DEVKITARM)/bin:$(PATH)
 PROJ    := duck_hunter
 TITLE   := $(PROJ)
 
-COBJS   := $(PROJ).o background.o toolbox.o
+COBJS   := $(PROJ).o background.o toolbox.o duck.o
 
 OBJS	:= $(COBJS)
 

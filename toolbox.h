@@ -1,9 +1,9 @@
 //
 // toolbox.h: 
 // 
-// Tools header for norf_demo
+// Tools header for obj_demo
 // 
-// (20060211-20060922, cearn)
+// (20060211-20060924, cearn)
 //
 // === NOTES ===
 // * This is a _small_ set of typedefs, #defines and inlines that can 
@@ -14,90 +14,15 @@
 #ifndef TOOLBOX_H
 #define TOOLBOX_H
 
-// === (tonc_types.h) ============================================
+#include "types.h"		// (tonc_types.h)
+#include "memmap.h"		// (tonc_memmap.h)
+#include "memdef.h"		// (tonc_memdef.h)
+#include "input.h"		// (tonc_input.h)
 
-// --- primary typedefs ---
 
-typedef unsigned char  u8,  byte;
-typedef unsigned short u16, hword;
-typedef unsigned int   u32, word;
-typedef unsigned long long u64;
-
-typedef signed char  s8;
-typedef signed short s16; 
-typedef signed int   s32;
-typedef signed long long s64;
-
-// and volatiles for registers 'n stuff
-typedef volatile u8  vu8;
-typedef volatile u16 vu16;
-typedef volatile u32 vu32;
-typedef volatile u64 vu64;
-
-typedef volatile s8  vs8;
-typedef volatile s16 vs16;
-typedef volatile s32 vs32;
-typedef volatile s64 vs64;
-
-// --- secondary typedefs ---
-
-typedef u16 COLOR;
 typedef u16 SCR_ENTRY, SE;
-typedef struct { u32 data[8];  } TILE, TILE4;
-typedef struct { u32 data[16]; } TILE8;
-
-
 typedef SCR_ENTRY	SCREENBLOCK[1024];
-typedef TILE		CHARBLOCK[512];
-typedef TILE8		CHARBLOCK8[256];
-
-// --- misc ---
-
-#define INLINE static inline
-
-
-// === (tonc_memmap.h) ===========================================
-
-#define MEM_IO		0x04000000
-#define MEM_PAL		0x05000000		// no 8bit write !!
-#define MEM_VRAM	0x06000000		// no 8bit write !!
-
-#define PAL_SIZE	0x00400
-#define VRAM_SIZE	0x18000
-
-#define M3_SIZE			0x12C00
-#define M4_SIZE			0x09600
-#define M5_SIZE			0x0A000
-#define CBB_SIZE		0x04000
-#define SBB_SIZE		0x00800
-#define VRAM_BG_SIZE	0x10000
-
-
-// --- memmap ---
-
-// pal_bg_mem[y] = COLOR (color y)
-#define pal_bg_mem		((COLOR*)MEM_PAL)
-
-// --- VRAM ---
-// tile_mem[y] = TILE[]   (char block y)
-// tile_mem[y][x] = TILE (char block y, tile x)
-#define tile_mem		( (CHARBLOCK*)MEM_VRAM)
-#define tile8_mem		((CHARBLOCK8*)MEM_VRAM)
-
-// se_mem[y] = SB_ENTRY[] (screen block y)
-// se_mem[y][x] = screen entry (screen block y, screen entry x)
 #define se_mem			((SCREENBLOCK*)MEM_VRAM)
-
-
-// --- registers ------------------------------------------------------
-
-#define REG_BASE	MEM_IO
-
-#define REG_DISPCNT			*(vu32*)(REG_BASE+0x0000)	// display control
-#define REG_DISPSTAT		*(vu16*)(REG_BASE+0x0004)	// display interupt status
-#define REG_VCOUNT			*(vu16*)(REG_BASE+0x0006)	// vertical count
-
-// --- background ---
 #define REG_BG0CNT			*(vu16*)(REG_BASE+0x0008)	// bg 0-3 control
 #define REG_BG1CNT			*(vu16*)(REG_BASE+0x000A)
 #define REG_BG2CNT			*(vu16*)(REG_BASE+0x000C)
@@ -111,37 +36,6 @@ typedef TILE8		CHARBLOCK8[256];
 #define REG_BG2VOFS			*(vu16*)(REG_BASE+0x001A)
 #define REG_BG3HOFS			*(vu16*)(REG_BASE+0x001C)
 #define REG_BG3VOFS			*(vu16*)(REG_BASE+0x001E)
-
-#define REG_KEYINPUT		*(vu16*)(REG_BASE+0x0130)	// Key status
-
-
-// === (tonc_memdef.h) =======================================----
-
-// --- REG_DISPCNT ---
-
-#define DCNT_MODE0				 0	//!< Mode 0; bg 0-4: reg
-#define DCNT_MODE1			0x0001	//!< Mode 1; bg 0-1: reg; bg 2: affine
-#define DCNT_MODE2			0x0002	//!< Mode 2; bg 2-2: affine
-#define DCNT_MODE3			0x0003	//!< Mode 3; bg2: 240x160\@16 bitmap
-#define DCNT_MODE4			0x0004	//!< Mode 4; bg2: 240x160\@8 bitmap
-#define DCNT_MODE5			0x0005	//!< Mode 5; bg2: 160x128\@16 bitmap
-#define DCNT_GB				0x0008	//!< (R) GBC indicator
-#define DCNT_PAGE			0x0010	//!< Page indicator
-#define DCNT_OAM_HBL		0x0020	//!< Allow OAM updates in HBlank
-#define DCNT_OBJ_2D				 0	//!< OBJ-VRAM as matrix
-#define DCNT_OBJ_1D			0x0040	//!< OBJ-VRAM as array
-#define DCNT_BLANK			0x0080	//!< Force screen blank
-#define DCNT_BG0			0x0100	//!< Enable bg 0
-#define DCNT_BG1			0x0200	//!< Enable bg 1
-#define DCNT_BG2			0x0400	//!< Enable bg 2
-#define DCNT_BG3			0x0800	//!< Enable bg 3
-#define DCNT_OBJ			0x1000	//!< Enable objects
-#define DCNT_WIN0			0x2000	//!< Enable window 0
-#define DCNT_WIN1			0x4000	//!< Enable window 1
-#define DCNT_WINOBJ			0x8000	//!< Enable object window
-
-
-// --- REG_BGxCNT ---
 
 #define BG_MOSAIC			0x0040	//!< Enable Mosaic
 #define BG_4BPP					 0	//!< 4bpp (16 color) bg (no effect on affine bg)
@@ -184,61 +78,18 @@ typedef TILE8		CHARBLOCK8[256];
 	| ((prio)&3)											\
 )
 
-// --- REG_KEYINPUT ---
 
-#define KEY_A			0x0001	//!< Button A
-#define KEY_B			0x0002	//!< Button B
-#define KEY_SELECT		0x0004	//!< Select button
-#define KEY_START		0x0008	//!< Start button
-#define KEY_RIGHT		0x0010	//!< Right D-pad
-#define KEY_LEFT		0x0020	//!< Left D-pad
-#define KEY_UP			0x0040	//!< Up D-pad
-#define KEY_DOWN		0x0080	//!< Down D-pad
-#define KEY_R			0x0100	//!< Shoulder R
-#define KEY_L			0x0200	//!< Shoulder L
-
-#define KEY_ANY			0x03FF	//!< any key
-#define KEY_DIR			0x00F0	//!< any-dpad
-#define KEY_ACCEPT		0x0009	//!< A or start
-#define KEY_CANCEL		0x0002	//!< B (well, it usually is)
-#define KEY_SHOULDER	0x0300	//!< L or R
-
-#define KEY_RESET		0x000F	//!< St+Se+A+B
-
-#define KEY_MASK		0x03FF
-
-// --- Reg screen entries ----------------------------------------------
-
-#define SE_HFLIP		0x0400	//!< Horizontal flip
-#define SE_VFLIP		0x0800	//!< Vertical flip
-
-#define SE_ID_MASK		0x03FF
-#define SE_ID_SHIFT			 0
-#define SE_ID(n)		((n)<<SE_ID_SHIFT)
-
-#define SE_FLIP_MASK	0x0C00
-#define SE_FLIP_SHIFT		10
-#define SE_FLIP(n)	 ((n)<<SE_FLIP_SHIFT)
-
-#define SE_PALBANK_MASK		0xF000
-#define SE_PALBANK_SHIFT		12
-#define SE_PALBANK(n)		((n)<<SE_PALBANK_SHIFT)
-
-
-#define SE_BUILD(id, pbank, hflip, vflip)	\
-( ((id)&0x03FF) | (((hflip)&1)<<10) | (((vflip)&1)<<11) | ((pbank)<<12) )
-
-
-// === (tonc_core.h) =============================================
+// === (tonc_core.h) ==================================================
 
 // tribool: 1 if {plus} on, -1 if {minus} on, 0 if {plus}=={minus}
 INLINE int bit_tribool(u32 x, int plus, int minus);
 
 
+extern COLOR *vid_page;
 extern u16 __key_curr, __key_prev;
 
 
-// === (tonc_video.h) ============================================
+// === (tonc_video.h) =================================================
 
 // --- sizes ---
 #define SCREEN_WIDTH	240
@@ -265,11 +116,43 @@ extern u16 __key_curr, __key_prev;
 INLINE COLOR RGB15(u32 red, u32 green, u32 blue);
 
 INLINE void vid_vsync();
+u16 *vid_flip();
+
+
+// --- Objects  ---
+
+void oam_init(OBJ_ATTR *obj, u32 count);
+void oam_copy(OBJ_ATTR *dst, const OBJ_ATTR *src, u32 count);
+
+INLINE OBJ_ATTR *obj_set_attr(OBJ_ATTR *obj, u16 a0, u16 a1, u16 a2);
+INLINE void obj_set_pos(OBJ_ATTR *obj, int x, int y);
+INLINE void obj_hide(OBJ_ATTR *oatr);
+INLINE void obj_unhide(OBJ_ATTR *obj, u16 mode);
+void obj_copy(OBJ_ATTR *dst, const OBJ_ATTR *src, u32 count);
 
 
 // === INLINES ========================================================
 
 // --- (tonc_core.h) --------------------------------------------------
+
+// --- Simple bit macros ---
+#define BIT(n)					( 1<<(n) )
+#define BIT_SHIFT(a, n)			( (a)<<(n) )
+#define BIT_SET(word, flag)		( word |=  (flag) )
+#define BIT_CLEAR(word, flag)	( word &= ~(flag) )
+#define BIT_FLIP(word, flag)	( word ^=  (flag) )
+#define BIT_EQ(word, flag)		( ((word)&(flag)) == (flag) )
+
+// some EVIL bit-field operations, >:)
+// _x needs shifting
+#define BFN_PREP(x, name)		( ((x)<<name##_SHIFT) & name##_MASK )
+#define BFN_GET(y, name)			( ((y) & name##_MASK)>>name##_SHIFT )
+#define BFN_SET(y, x, name)		(y = ((y)&~name##_MASK) | BFN_PREP(x,name) )
+
+// x already shifted
+#define BFN_PREP2(x, name)		( (x) & name##_MASK )
+#define BFN_GET2(y, name)		( (y) & name##_MASK )
+#define BFN_SET2(y, x, name)		(y = ((y)&~name##_MASK) | BFN_PREP2(x,name) )
 
 //! Gives a tribool (-1, 0, or +1) depending on the state of some bits.
 /*! Looks at the \a plus and \a minus bits of \a flags, and subtracts 
@@ -289,8 +172,8 @@ INLINE int bit_tribool(u32 flags, int plus, int minus)
 //! Wait for next VBlank
 INLINE void vid_vsync()
 {
-	while(REG_VCOUNT >= 160);   // wait till VDraw
-	while(REG_VCOUNT < 160);    // wait till VBlank
+	while(REG_VCOUNT >= 160);	// wait till VDraw
+	while(REG_VCOUNT < 160);	// wait till VBlank
 }
 
 //! Create a 15bit BGR color.
@@ -298,6 +181,34 @@ INLINE COLOR RGB15(u32 red, u32 green, u32 blue)
 {	return red | (green<<5) | (blue<<10);	}
 
 
+// --- Objects ---
+
+
+//! Set the attributes of an object.
+INLINE OBJ_ATTR *obj_set_attr(OBJ_ATTR *obj, u16 a0, u16 a1, u16 a2)
+{
+	obj->attr0= a0; obj->attr1= a1; obj->attr2= a2;
+	return obj;
+}
+
+//! Set the position of \a obj
+INLINE void obj_set_pos(OBJ_ATTR *obj, int x, int y)
+{
+	BFN_SET(obj->attr0, y, ATTR0_Y);
+	BFN_SET(obj->attr1, x, ATTR1_X);
+}
+
+//! Hide an object.
+INLINE void obj_hide(OBJ_ATTR *obj)
+{	BFN_SET2(obj->attr0, ATTR0_HIDE, ATTR0_MODE);		}
+
+//! Unhide an object.
+/*! \param obj	Object to unhide.
+*	\param mode	Object mode to unhide to. Necessary because this affects
+*	  the affine-ness of the object.
+*/
+INLINE void obj_unhide(OBJ_ATTR *obj, u16 mode)
+{	BFN_SET2(obj->attr0, mode, ATTR0_MODE);			}
+
 
 #endif // TOOLBOX_H
-

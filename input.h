@@ -14,7 +14,11 @@
 #ifndef __INPUT__
 #define __INPUT__
 
-#include "toolbox.h"
+#include "memmap.h"
+#include "memdef.h"
+
+
+INLINE int bit_tribool(u32 x, int plus, int minus);
 
 // === CONSTANTS ======================================================
 
