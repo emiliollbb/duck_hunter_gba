@@ -1,6 +1,6 @@
 //
 // background_demo.c
-// Essential tilemap loading: the start of backgroundstar from metroid 1
+// Essential tilemap loading: the start of backgroundstar from ducksoid 1
 //
 // (20060221 - 20070216, cearn)
 
@@ -22,17 +22,24 @@ OBJ_AFFINE *obj_aff_buffer= (OBJ_AFFINE*)obj_buffer;
 // L & R shift starting tile
 void obj_test()
 {
-	int x= 96, y= 32, hx=0, hy=160-32-32;
+	int i=0, y= 32, hx=0, hy=160-32-32;
+	int x[4];
 	u32 tid= 0, pb= 0;		// tile id, pal-bank
 	u32 frame = 0;
 
-	OBJ_ATTR *metr= &obj_buffer[0];
-	OBJ_ATTR *hunter= &obj_buffer[1];
-	obj_set_attr(metr, 
-		ATTR0_SQUARE,				// Square, regular sprite
-		//ATTR1_SIZE_64,					// 64x64p, 
-		ATTR1_SIZE_32,					// duck is 32x32p, 
-		ATTR2_PALBANK(pb) | tid);		// palbank 0, tile 0
+	for(i=0; i<4; i++) {
+		x[i]=i*50;
+	}
+
+	OBJ_ATTR *ducks= &obj_buffer[0];
+	OBJ_ATTR *hunter= &obj_buffer[4];
+	
+	for(i=0; i<4; i++) {
+		obj_set_attr(&ducks[i], 
+			ATTR0_SQUARE,
+			ATTR1_SIZE_32,
+			ATTR2_PALBANK(pb) | tid);
+	}
 
 	
 	obj_set_attr(hunter, 
@@ -41,9 +48,6 @@ void obj_test()
 		ATTR2_PALBANK(0) | (16*3));		// palbank 0, tile 0
 
 
-	// position sprite (redundant here; the _real_ position
-	// is set further down
-	obj_set_pos(metr, x, y);
 	obj_set_pos(hunter, hx, hy);
 
 	while(1)
@@ -54,7 +58,11 @@ void obj_test()
 
 		// move left/right
 		hx += 2*key_tri_horz();
-		if(frame%2) x++;
+		if(frame%2) {
+			for(i=0; i<4; i++) {
+				x[i]++;
+			}
+		}
 
 		// move up/down
 		//hy += 2*key_tri_vert();
@@ -67,8 +75,6 @@ void obj_test()
 			hunter->attr1 ^= ATTR1_HFLIP;
 			
 		}
-		if(key_hit(KEY_B))	// vertically
-			metr->attr1 ^= ATTR1_VFLIP;
 		
 		// make it glow (via palette swapping)
 		pb= key_is_down(KEY_SELECT) ? 1 : 0;
@@ -78,12 +84,15 @@ void obj_test()
 			REG_DISPCNT ^= DCNT_OBJ_1D;
 
 		// Hey look, it's one of them build macros!
-		metr->attr2= ATTR2_BUILD(frame/16%3*16, pb, 0);
-		obj_set_pos(metr, x, y);
+		for(i=0; i<4; i++) {
+			ducks[i].attr2= ATTR2_BUILD(frame/16%3*16, i%2, 0);
+			obj_set_pos(&ducks[i], x[i], y);
+		}
+		
 		
 		obj_set_pos(hunter, hx, hy);
 
-		oam_copy(oam_mem, obj_buffer, 2);	// only need to update one
+		oam_copy(oam_mem, obj_buffer, 5);	// only need to update one
 	}
 }
 
