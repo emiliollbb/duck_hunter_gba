@@ -71,7 +71,7 @@ void obj_test()
 		tid += bit_tribool(key_hit(-1), KI_R, KI_L);
 
 		// flip
-		if(key_hit(KEY_A)) {	// horizontally
+		if(key_hit(KEY_B)) {	// horizontally
 			hunter->attr1 ^= ATTR1_HFLIP;
 			
 		}
