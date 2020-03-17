@@ -23,16 +23,22 @@ OBJ_AFFINE *obj_aff_buffer= (OBJ_AFFINE*)obj_buffer;
 void obj_test()
 {
 	int i=0, y= 32, hx=0, hy=160-32-32;
-	int x[4];
+	int x[4], bx[2], by[2];
 	u32 tid= 0, pb= 0;		// tile id, pal-bank
 	u32 frame = 0;
 
 	for(i=0; i<4; i++) {
 		x[i]=i*50;
 	}
+	
+	for(i=0; i<2; i++) {
+		bx[i]=i*50;
+		by[i]=100;
+	}
 
 	OBJ_ATTR *ducks= &obj_buffer[0];
 	OBJ_ATTR *hunter= &obj_buffer[4];
+	OBJ_ATTR *bullets= &obj_buffer[5];
 	
 	for(i=0; i<4; i++) {
 		obj_set_attr(&ducks[i], 
@@ -47,6 +53,12 @@ void obj_test()
 		ATTR1_SIZE_32,
 		ATTR2_PALBANK(0) | (16*3));		// palbank 0, tile 0
 
+	for(i=0; i<2; i++) {
+		obj_set_attr(&bullets[i], 
+			ATTR0_SQUARE,
+			ATTR1_SIZE_32,
+			ATTR2_PALBANK(0) | (16*4));
+	}
 
 	obj_set_pos(hunter, hx, hy);
 
@@ -63,6 +75,11 @@ void obj_test()
 				x[i]++;
 			}
 		}
+		
+		for(i=0; i<2; i++) {
+			bx[i]++;
+			by[i]--;
+		}
 
 		// move up/down
 		//hy += 2*key_tri_vert();
@@ -71,9 +88,17 @@ void obj_test()
 		tid += bit_tribool(key_hit(-1), KI_R, KI_L);
 
 		// flip
-		if(key_hit(KEY_B)) {	// horizontally
+		if(key_hit(KEY_R)) {	// horizontally
 			hunter->attr1 ^= ATTR1_HFLIP;
 			
+		}
+		if(key_hit(KEY_A)) {
+			by[0]=hy;
+			bx[0]=hx;
+		}
+		if(key_hit(KEY_B)) {
+			by[1]=hy;
+			bx[1]=hx;
 		}
 		
 		// make it glow (via palette swapping)
@@ -83,16 +108,18 @@ void obj_test()
 		if(key_hit(KEY_START))
 			REG_DISPCNT ^= DCNT_OBJ_1D;
 
-		// Hey look, it's one of them build macros!
 		for(i=0; i<4; i++) {
 			ducks[i].attr2= ATTR2_BUILD(frame/16%3*16, i%2, 0);
 			obj_set_pos(&ducks[i], x[i], y);
+		}
+		for(i=0; i<2; i++) {
+			obj_set_pos(&bullets[i], bx[i], by[i]);
 		}
 		
 		
 		obj_set_pos(hunter, hx, hy);
 
-		oam_copy(oam_mem, obj_buffer, 5);	// only need to update one
+		oam_copy(oam_mem, obj_buffer, 7);	// only need to update one
 	}
 }
 
