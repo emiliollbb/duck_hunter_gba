@@ -24,6 +24,7 @@ void obj_test()
 {
 	int x= 96, y= 32, hx=0, hy=160-32-32;
 	u32 tid= 0, pb= 0;		// tile id, pal-bank
+	u32 frame = 0;
 
 	OBJ_ATTR *metr= &obj_buffer[0];
 	OBJ_ATTR *hunter= &obj_buffer[1];
@@ -48,6 +49,7 @@ void obj_test()
 	while(1)
 	{
 		vid_vsync();
+		frame++;
 		key_poll();
 
 		// move left/right
@@ -60,8 +62,10 @@ void obj_test()
 		tid += bit_tribool(key_hit(-1), KI_R, KI_L);
 
 		// flip
-		if(key_hit(KEY_A))	// horizontally
-			metr->attr1 ^= ATTR1_HFLIP;
+		if(key_hit(KEY_A)) {	// horizontally
+			hunter->attr1 ^= ATTR1_HFLIP;
+			
+		}
 		if(key_hit(KEY_B))	// vertically
 			metr->attr1 ^= ATTR1_VFLIP;
 		
@@ -73,7 +77,7 @@ void obj_test()
 			REG_DISPCNT ^= DCNT_OBJ_1D;
 
 		// Hey look, it's one of them build macros!
-		metr->attr2= ATTR2_BUILD(tid, pb, 0);
+		metr->attr2= ATTR2_BUILD(frame/16%3*16, pb, 0);
 		obj_set_pos(metr, x, y);
 		
 		obj_set_pos(hunter, hx, hy);
