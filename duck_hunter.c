@@ -33,8 +33,8 @@ void obj_test()
 	}
 	
 	for(i=0; i<2; i++) {
-		bx[i]=i*50;
-		by[i]=100;
+		bx[i]=-10;
+		by[i]=-10;
 	}
 
 	OBJ_ATTR *ducks= &obj_buffer[0];
@@ -78,8 +78,14 @@ void obj_test()
 		}
 		
 		for(i=0; i<2; i++) {
-			bx[i]++;
-			by[i]--;
+			if(bx[i]>0) {
+				bx[i]++;
+				by[i]--;
+			}
+			if(bx[i]>240 || by[i]<0) {
+				bx[i]=-10;
+				by[i]=-10;
+			}
 		}
 
 		// move up/down
@@ -94,12 +100,16 @@ void obj_test()
 			
 		}
 		if(key_hit(KEY_A)) {
-			by[0]=hy-5;
-			bx[0]=hx+25;
+			if(bx[0]<0) {
+				by[0]=hy-5;
+				bx[0]=hx+25;
+			}
 		}
 		if(key_hit(KEY_B)) {
-			by[1]=hy-5;
-			bx[1]=hx+25;
+			if(bx[1]<0) {
+				by[1]=hy-5;
+				bx[1]=hx+25;
+			}
 		}
 		
 		// make it glow (via palette swapping)
