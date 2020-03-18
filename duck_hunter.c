@@ -26,7 +26,8 @@ void obj_test()
 	int dx[4], dy[4], bx[2], by[2];
 	u32 tid= 0, pb= 0;		// tile id, pal-bank
 	u32 frame = 0;
-
+	
+	
 	for(i=0; i<4; i++) {
 		dx[i]=i*50;
 		dy[i]=32;
@@ -100,9 +101,12 @@ void obj_test()
 			
 		}
 		if(key_hit(KEY_A)) {
+			// Play the actual note
+				REG_SND1FREQ = SFREQ_RESET | SND_RATE(NOTE_C, -2);
 			if(bx[0]<0) {
 				by[0]=hy-5;
 				bx[0]=hx+25;
+				
 			}
 		}
 		if(key_hit(KEY_B)) {
@@ -139,6 +143,19 @@ int main()
 	// Init interrupts, and enable VBlank irq
 	irq_init(NULL);
 	irq_add(II_VBLANK, NULL);
+	
+	// turn sound on
+	REG_SNDSTAT= SSTAT_ENABLE;
+	// snd1 on left/right ; both full volume
+	REG_SNDDMGCNT = SDMG_BUILD_LR(SDMG_SQR1, 7);
+	// DMG ratio to 100%
+	REG_SNDDSCNT= SDS_DMG100;
+
+	// no sweep
+	REG_SND1SWEEP= SSW_OFF;
+	// envelope: vol=12, decay, max step time (7) ; 50% duty
+	REG_SND1CNT= SSQR_ENV_BUILD(12, 0, 7) | SSQR_DUTY1_2;
+	REG_SND1FREQ= 0;
 	
 	// Load palette
 	memcpy(pal_bg_mem, backgroundPal, backgroundPalLen);
