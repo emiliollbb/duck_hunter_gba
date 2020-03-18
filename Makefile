@@ -14,63 +14,124 @@ PATH := $(DEVKITARM)/bin:$(PATH)
 PROJ    := duck_hunter
 TITLE   := $(PROJ)
 
-COBJS   := $(PROJ).o background.o toolbox.o duck.o
+LIBTONC	:= /C/tonc/code/tonclib
+INCLUDE  := -I$(LIBTONC)/include
+LIBPATHS := -L$(LIBTONC)/lib
 
-OBJS	:= $(COBJS)
+LIBS    := -ltonc
 
-# --- boot type (MB=0 : normal. MB=1 : multiboot) ---
+# ROM, IWRAM, asm sources
+RCSRC   := $(PROJ).c background.c duck.c
+ICSRC   := 
+SSRC    := 
 
-MB = 0
+bMB     := 0		# Boot mode: cart/multiboot
+bGENASM := 0		# Generate asm for C files 
+bMAP    := 0		# Generate map file
 
-ifeq ($(MB),1)
+# === The rest need not be altered (probably) =========================
 
-TARGET	:= $(PROJ).mb
-SPECS	:= -specs=gba_mb.specs
+CSRC    := $(RCSRC) $(ICSRC)
 
+RCOBJ   := $(RCSRC:.c=.o)
+ICOBJ   := $(ICSRC:.c=.o)
+COBJ    := $(RCOBJ) $(ICOBJ)
+SOBJ    := $(SSRC:.s=.o)
+
+OBJ     := $(COBJ) $(SOBJ)
+
+ifeq ($(strip $(bMB)), 1)
+TARGET  := $(PROJ).mb
+SPECS   := -specs=gba_mb.specs
 else
-
-TARGET	:= $(PROJ)
-SPECS	:= -specs=gba.specs
-
+TARGET  := $(PROJ)
+SPECS   := -specs=gba.specs
 endif
 
 # --- Compiling -------------------------------------------------------
 
-CROSS	?= arm-none-eabi-
-AS		:= $(CROSS)as
-CC		:= $(CROSS)gcc
-LD		:= $(CROSS)gcc
-OBJCOPY	:= $(CROSS)objcopy
+CROSS   ?= arm-none-eabi-
+AS      := $(CROSS)gcc
+CC      := $(CROSS)gcc
+LD      := $(CROSS)gcc
+OBJCOPY := $(CROSS)objcopy
 
+ARCH    := -mthumb-interwork -mthumb
+RARCH   := -mthumb-interwork -mthumb
+IARCH   := -mthumb-interwork -marm
 
-ARCH	:= -mthumb-interwork -mthumb
+CBASE   := $(INCLUDE) -O2 -Wall -fno-strict-aliasing
+RCFLAGS := $(CBASE) $(RARCH)
+ICFLAGS := $(CBASE) $(IARCH) -mlong-calls
+CFLAGS  := $(RCFLAGS)
 
-ASFLAGS	:= -mthumb-interwork
-CFLAGS	:= $(ARCH) -O2 -Wall -fno-strict-aliasing
-LDFLAGS	:= $(ARCH) $(SPECS)
+ASFLAGS := -x assembler-with-cpp  -c -mthumb-interwork
+LDFLAGS := $(ARCH) $(SPECS) $(LIBPATHS) $(LIBS)
 
-.PHONY : build clean
+ifeq ($(strip $(bMAP)), 1)
+	LDFLAGS += -Wl,-Map,$(PROJ).map
+endif
+
+# === TARGETS =========================================================
+
+.PHONY: build clean
 
 # --- Build -----------------------------------------------------------
 
-build : $(TARGET).gba
+# --- Main target ---
+build: depends $(TARGET).gba
+	@echo done
 
-
+# --- Translation ---
+# ---.elf -> .gba ---
 $(TARGET).gba : $(TARGET).elf
-	$(OBJCOPY) -v -O binary $< $@
+	@$(OBJCOPY) -v -O binary $< $@
 	-@gbafix $@ -t$(TITLE)
 
-$(TARGET).elf : $(OBJS)
+# --- Linking -------------
+# --- *.o *.a -> .elf -----
+$(TARGET).elf : $(OBJ) 
 	$(LD) $^ $(LDFLAGS) -o $@
 
-$(COBJS) : %.o : %.c
-	$(CC) $(CFLAGS) -c $< -o $@
-	
+# --- ROM compilation ---
+# --- *.c -> *.o --------
+$(RCOBJ) : %.o : %.c
+	$(CC) $(RCFLAGS) -c $< -o $@
+ifeq ($(strip $(bGENASM)), 1)
+	$(CC) $(RCFLAGS) -fverbose-asm -S $<
+endif
+
+# --- IWRAM compilation ----
+# *.iwram.c -> *.iwram.o ---
+$(ICOBJ) : %.iwram.o : %.iwram.c
+	$(CC) $(ICFLAGS) -c $< -o $@
+ifeq ($(strip $(bGENASM)), 1)
+	$(CC) $(ICFLAGS) -fverbose-asm -S $<
+endif
+
+# --- Assembling ---
+# --- *.s -> *.o ---
+$(SOBJ) : %.o : %.s
+	$(AS) $(ASFLAGS) -c $< -o $@
+
+# --- Header dependencies ---
+# --- *.c -> .d -------------
+depends:
+	$(CC) -MM $(CFLAGS) -c $(ICSRC) $(RCSRC) > $(PROJ).d
+
+-include $(PROJ).d
+
+# --- Build Lib -------------------------------------------------------
+
+buildlib : 
+	$(MAKE) -C $(UDIR) -f tonclib.mak	buildlib
+
 # --- Clean -----------------------------------------------------------
 
 clean : 
-	@rm -fv *.gba
-	@rm -fv *.elf
-	@rm -fv *.o
+	@rm -fv $(TARGET).gba
+	@rm -fv $(TARGET).elf $(PROJ).map $(PROJ).d
+	@rm -fv $(CSRC:.c=.s)
+	@rm -fv $(OBJ)
 
 #EOF

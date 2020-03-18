@@ -5,8 +5,8 @@
 // (20060221 - 20070216, cearn)
 
 #include <string.h>
+#include <tonc.h>
 
-#include "toolbox.h"
 #include "background.h"
 #include "duck.h"
 
@@ -65,7 +65,7 @@ void obj_test()
 
 	while(1)
 	{
-		vid_vsync();
+		VBlankIntrWait();
 		frame++;
 		key_poll();
 
@@ -136,6 +136,10 @@ void obj_test()
 
 int main()
 {
+	// Init interrupts, and enable VBlank irq
+	irq_init(NULL);
+	irq_add(II_VBLANK, NULL);
+	
 	// Load palette
 	memcpy(pal_bg_mem, backgroundPal, backgroundPalLen);
 	// Load tiles into CBB 0
