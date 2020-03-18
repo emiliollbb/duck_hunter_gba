@@ -26,6 +26,7 @@ void obj_test()
 	int dx[4], dy[4], bx[2], by[2];
 	u32 tid= 0, pb= 0;		// tile id, pal-bank
 	u32 frame = 0;
+	int flip = 1;
 	
 	
 	for(i=0; i<4; i++) {
@@ -79,11 +80,11 @@ void obj_test()
 		}
 		
 		for(i=0; i<2; i++) {
-			if(bx[i]>0) {
-				bx[i]++;
+			if(bx[i]>-10) {
+				bx[i]+=flip;
 				by[i]--;
 			}
-			if(bx[i]>240 || by[i]<0) {
+			if(bx[i]>240 || by[i]<0 || bx[i]<-8) {
 				bx[i]=-10;
 				by[i]=-10;
 			}
@@ -96,23 +97,36 @@ void obj_test()
 		tid += bit_tribool(key_hit(-1), KI_R, KI_L);
 
 		// flip
-		if(key_hit(KEY_R)) {	// horizontally
-			hunter->attr1 ^= ATTR1_HFLIP;
-			
+		if(key_hit(KEY_R)) {
+			hunter->attr1 &= ~ATTR1_HFLIP;
+			flip=1;
+		}
+		if(key_hit(KEY_L)) {
+			hunter->attr1 |= ATTR1_HFLIP;
+			flip=-1;
 		}
 		if(key_hit(KEY_A)) {
-			// Play the actual note
-				REG_SND1FREQ = SFREQ_RESET | SND_RATE(NOTE_C, -2);
 			if(bx[0]<0) {
+				REG_SND1FREQ = SFREQ_RESET | SND_RATE(NOTE_C, -2);
 				by[0]=hy-5;
-				bx[0]=hx+25;
-				
+				if(flip==1) {
+					bx[0]=hx+25;
+				}
+				else {
+					bx[0]=hx;
+				}
 			}
 		}
 		if(key_hit(KEY_B)) {
 			if(bx[1]<0) {
+				REG_SND1FREQ = SFREQ_RESET | SND_RATE(NOTE_C, -2);
 				by[1]=hy-5;
-				bx[1]=hx+25;
+				if(flip==1) {
+					bx[1]=hx+25;
+				}
+				else {
+					bx[1]=hx;
+				}
 			}
 		}
 		
@@ -154,7 +168,7 @@ int main()
 	// no sweep
 	REG_SND1SWEEP= SSW_OFF;
 	// envelope: vol=12, decay, max step time (7) ; 50% duty
-	REG_SND1CNT= SSQR_ENV_BUILD(12, 0, 7) | SSQR_DUTY1_2;
+	REG_SND1CNT= SSQR_ENV_BUILD(12, 0, 1) | SSQR_DUTY1_2;
 	REG_SND1FREQ= 0;
 	
 	// Load palette
