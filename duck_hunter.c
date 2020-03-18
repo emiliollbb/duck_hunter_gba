@@ -23,12 +23,12 @@ OBJ_AFFINE *obj_aff_buffer= (OBJ_AFFINE*)obj_buffer;
 void obj_test()
 {
 	int i=0, y= 32, hx=0, hy=160-32-32;
-	int x[4], bx[2], by[2];
+	int dx[4], bx[2], by[2];
 	u32 tid= 0, pb= 0;		// tile id, pal-bank
 	u32 frame = 0;
 
 	for(i=0; i<4; i++) {
-		x[i]=i*50;
+		dx[i]=i*50;
 	}
 	
 	for(i=0; i<2; i++) {
@@ -56,7 +56,7 @@ void obj_test()
 	for(i=0; i<2; i++) {
 		obj_set_attr(&bullets[i], 
 			ATTR0_SQUARE,
-			ATTR1_SIZE_32,
+			ATTR1_SIZE_8,
 			ATTR2_PALBANK(0) | (16*4));
 	}
 
@@ -72,7 +72,7 @@ void obj_test()
 		hx += 2*key_tri_horz();
 		if(frame%2) {
 			for(i=0; i<4; i++) {
-				x[i]++;
+				dx[i]++;
 			}
 		}
 		
@@ -110,7 +110,7 @@ void obj_test()
 
 		for(i=0; i<4; i++) {
 			ducks[i].attr2= ATTR2_BUILD(frame/16%3*16, i%2, 0);
-			obj_set_pos(&ducks[i], x[i], y);
+			obj_set_pos(&ducks[i], dx[i], y);
 		}
 		for(i=0; i<2; i++) {
 			obj_set_pos(&bullets[i], bx[i], by[i]);
