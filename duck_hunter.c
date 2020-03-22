@@ -10,6 +10,9 @@
 #include "background.h"
 #include "duck.h"
 
+#define DUCKS_SIZE 4
+#define BULLETS_SIZE 2
+
 struct cinematic_s {
     int x,y;
 };
@@ -24,7 +27,7 @@ struct hunter_s {
 };
 
 struct game_s {
-    struct cinematic_s ducks[4];
+    struct cinematic_s ducks[DUCKS_SIZE];
     struct bullet_s bullets[2];
     struct hunter_s hunter;
 };
@@ -38,12 +41,12 @@ u32 frame = 0;
 void inline init_game(){
     int i;
     
-    for(i=0; i<4; i++) {
+    for(i=0; i<DUCKS_SIZE; i++) {
 		game.ducks[i].x=i*50;
 		game.ducks[i].y=32;
 	}
 	
-	for(i=0; i<2; i++) {
+	for(i=0; i<BULLETS_SIZE; i++) {
 		game.bullets[i].x=-10;
 		game.bullets[i].y=-10;
 	}
@@ -51,6 +54,7 @@ void inline init_game(){
     game.hunter.x=0;
     game.hunter.y=160-32-32;
     game.hunter.flip=1;
+    game.hunter.object=&obj_buffer[DUCKS_SIZE];
 }
 
 // testing a few sprite things
@@ -69,10 +73,9 @@ void obj_test()
 	init_game();
 
 	OBJ_ATTR *ducks= &obj_buffer[0];
-	game.hunter.object= &obj_buffer[4];
 	OBJ_ATTR *bullets= &obj_buffer[5];
 	
-	for(i=0; i<4; i++) {
+	for(i=0; i<DUCKS_SIZE; i++) {
 		obj_set_attr(&ducks[i], 
 			ATTR0_SQUARE,
 			ATTR1_SIZE_32,
@@ -85,7 +88,7 @@ void obj_test()
 		ATTR1_SIZE_32,
 		ATTR2_PALBANK(0) | (16*3));		// palbank 0, tile 0
 
-	for(i=0; i<2; i++) {
+	for(i=0; i<BULLETS_SIZE; i++) {
 		obj_set_attr(&bullets[i], 
 			ATTR0_SQUARE,
 			ATTR1_SIZE_8,
@@ -108,7 +111,7 @@ void obj_test()
 			}
 		}
 		
-		for(i=0; i<2; i++) {
+		for(i=0; i<BULLETS_SIZE; i++) {
 			if(game.bullets[i].x>-10) {
 				game.bullets[i].x+=game.bullets[i].vx;
 				game.bullets[i].y--;
@@ -162,11 +165,11 @@ void obj_test()
 		if(key_hit(KEY_START))
 			REG_DISPCNT ^= DCNT_OBJ_1D;
 
-		for(i=0; i<4; i++) {
+		for(i=0; i<DUCKS_SIZE; i++) {
 			ducks[i].attr2= ATTR2_BUILD(frame/16%3*16, i%2, 0);
 			obj_set_pos(&ducks[i], game.ducks[i].x, game.ducks[i].y);
 		}
-		for(i=0; i<2; i++) {
+		for(i=0; i<BULLETS_SIZE; i++) {
 			obj_set_pos(&bullets[i], game.bullets[i].x, game.bullets[i].y);
 		}
 		
