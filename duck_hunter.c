@@ -14,9 +14,14 @@ struct duck_s {
     int x,y;
 };
 
+struct bullet_s {
+    int x,y;
+};
+
 struct game_s {
     struct duck_s ducks[4];
-    int dx[4], dy[4], bx[2], by[2];
+    struct bullet_s bullets[2];
+    int bx[2], by[2];
 };
 
 OBJ_ATTR obj_buffer[128];
@@ -46,8 +51,8 @@ void obj_test()
 	}
 	
 	for(i=0; i<2; i++) {
-		game.bx[i]=-10;
-		game.by[i]=-10;
+		game.bullets[i].x=-10;
+		game.bullets[i].y=-10;
 	}
 
 	OBJ_ATTR *ducks= &obj_buffer[0];
@@ -91,13 +96,13 @@ void obj_test()
 		}
 		
 		for(i=0; i<2; i++) {
-			if(game.bx[i]>-10) {
-				game.bx[i]+=flip;
-				game.by[i]--;
+			if(game.bullets[i].x>-10) {
+				game.bullets[i].x+=flip;
+				game.bullets[i].y--;
 			}
-			if(game.bx[i]>240 || game.by[i]<0 || game.bx[i]<-8) {
-				game.bx[i]=-10;
-				game.by[i]=-10;
+			if(game.bullets[i].x>240 || game.bullets[i].y<0 || game.bullets[i].x<-8) {
+				game.bullets[i].x=-10;
+				game.bullets[i].y=-10;
 			}
 		}
 
@@ -117,26 +122,26 @@ void obj_test()
 			flip=-1;
 		}
 		if(key_hit(KEY_A)) {
-			if(game.bx[0]<0) {
+			if(game.bullets[0].x<0) {
 				REG_SND1FREQ = SFREQ_RESET | SND_RATE(NOTE_C, -2);
-				game.by[0]=hy-5;
+				game.bullets[0].y=hy-5;
 				if(flip==1) {
-					game.bx[0]=hx+25;
+					game.bullets[0].x=hx+25;
 				}
 				else {
-					game.bx[0]=hx;
+					game.bullets[0].x=hx;
 				}
 			}
 		}
 		if(key_hit(KEY_B)) {
-			if(game.bx[1]<0) {
+			if(game.bullets[1].x<0) {
 				REG_SND1FREQ = SFREQ_RESET | SND_RATE(NOTE_C, -2);
-				game.by[1]=hy-5;
+				game.bullets[1].y=hy-5;
 				if(flip==1) {
-					game.bx[1]=hx+25;
+					game.bullets[1].x=hx+25;
 				}
 				else {
-					game.bx[1]=hx;
+					game.bullets[1].x=hx;
 				}
 			}
 		}
@@ -153,7 +158,7 @@ void obj_test()
 			obj_set_pos(&ducks[i], game.ducks[i].x, game.ducks[i].y);
 		}
 		for(i=0; i<2; i++) {
-			obj_set_pos(&bullets[i], game.bx[i], game.by[i]);
+			obj_set_pos(&bullets[i], game.bullets[i].x, game.bullets[i].y);
 		}
 		
 		
