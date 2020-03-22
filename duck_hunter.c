@@ -54,8 +54,6 @@ void obj_test()
 {
 	int i=0;
 	
-	u32 tid= 0;		// tile id, pal-bank
-	
 	int flip = 1;
 	
 	
@@ -69,7 +67,7 @@ void obj_test()
 		obj_set_attr(&ducks[i], 
 			ATTR0_SQUARE,
 			ATTR1_SIZE_32,
-			ATTR2_PALBANK(0) | tid);
+			ATTR2_PALBANK(0) | 0);
 	}
 
 	
@@ -114,9 +112,6 @@ void obj_test()
 
 		// move up/down
 		//game.hunter.y += 2*key_tri_vert();
-
-		// increment/decrement starting tile with R/L
-		tid += bit_tribool(key_hit(-1), KI_R, KI_L);
 
 		// flip
 		if(key_hit(KEY_R)) {
