@@ -50,17 +50,29 @@ void init_game() {
 		game.ducks[i].x=i*50;
 		game.ducks[i].y=32;
         game.ducks[i].object=&obj_buffer[game.objects++];
+        obj_set_attr(game.ducks[i].object, 
+			ATTR0_SQUARE,
+			ATTR1_SIZE_32,
+			ATTR2_PALBANK(0) | 0);
 	}
     
     game.hunter.x=0;
     game.hunter.y=160-32-32;
     game.hunter.flip=1;
     game.hunter.object=&obj_buffer[game.objects++];
+    obj_set_attr(game.hunter.object, 
+		ATTR0_SQUARE,
+		ATTR1_SIZE_32,
+		ATTR2_PALBANK(0) | (16*3));
     	
 	for(i=0; i<BULLETS_SIZE; i++) {
 		game.bullets[i].x=-10;
 		game.bullets[i].y=-10;
         game.bullets[i].object=&obj_buffer[game.objects++];
+        obj_set_attr(game.bullets[i].object, 
+			ATTR0_SQUARE,
+			ATTR1_SIZE_8,
+			ATTR2_PALBANK(0) | (16*4));
 	}
     
 }
@@ -80,25 +92,6 @@ void obj_test()
 	
 	init_game();
 	
-	for(i=0; i<DUCKS_SIZE; i++) {
-		obj_set_attr(game.ducks[i].object, 
-			ATTR0_SQUARE,
-			ATTR1_SIZE_32,
-			ATTR2_PALBANK(0) | 0);
-	}
-
-	
-	obj_set_attr(game.hunter.object, 
-		ATTR0_SQUARE,
-		ATTR1_SIZE_32,
-		ATTR2_PALBANK(0) | (16*3));		// palbank 0, tile 0
-
-	for(i=0; i<BULLETS_SIZE; i++) {
-		obj_set_attr(game.bullets[i].object, 
-			ATTR0_SQUARE,
-			ATTR1_SIZE_8,
-			ATTR2_PALBANK(0) | (16*4));
-	}
 
 	obj_set_pos(game.hunter.object, game.hunter.x, game.hunter.y);
 
