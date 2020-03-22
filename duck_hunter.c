@@ -21,7 +21,6 @@ struct bullet_s {
 struct game_s {
     struct duck_s ducks[4];
     struct bullet_s bullets[2];
-    int bx[2], by[2];
 };
 
 OBJ_ATTR obj_buffer[128];
