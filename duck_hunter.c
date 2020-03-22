@@ -77,6 +77,18 @@ void init_game() {
     
 }
 
+void render_frame() {
+    int i;
+    
+    for(i=0; i<DUCKS_SIZE; i++) {
+        game.ducks[i].object->attr2= ATTR2_BUILD(frame/16%3*16, i%2, 0);
+        obj_set_pos(game.ducks[i].object, game.ducks[i].x, game.ducks[i].y);
+    }
+    for(i=0; i<BULLETS_SIZE; i++) {
+        obj_set_pos(game.bullets[i].object, game.bullets[i].x, game.bullets[i].y);
+    }
+}
+
 // testing a few sprite things
 // D-pad: move 
 // SELECT: switch palette
@@ -160,16 +172,11 @@ void obj_test()
 		}
 		
 		// toggle mapping mode
-		if(key_hit(KEY_START))
-			REG_DISPCNT ^= DCNT_OBJ_1D;
+		if(key_hit(KEY_START)) {
+			            
+        }
 
-		for(i=0; i<DUCKS_SIZE; i++) {
-			game.ducks[i].object->attr2= ATTR2_BUILD(frame/16%3*16, i%2, 0);
-			obj_set_pos(game.ducks[i].object, game.ducks[i].x, game.ducks[i].y);
-		}
-		for(i=0; i<BULLETS_SIZE; i++) {
-			obj_set_pos(game.bullets[i].object, game.bullets[i].x, game.bullets[i].y);
-		}
+		render_frame();
 		
 		
 		obj_set_pos(game.hunter.object, game.hunter.x, game.hunter.y);
