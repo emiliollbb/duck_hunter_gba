@@ -27,8 +27,9 @@ OBJ_ATTR obj_buffer[128];
 OBJ_AFFINE *obj_aff_buffer= (OBJ_AFFINE*)obj_buffer;
 
 struct game_s game;
+u32 frame = 0;
 
-void init_game(){
+void inline init_game(){
     int i;
     
     for(i=0; i<4; i++) {
@@ -54,7 +55,7 @@ void obj_test()
 	int i=0, hx=0, hy=160-32-32;
 	
 	u32 tid= 0, pb= 0;		// tile id, pal-bank
-	u32 frame = 0;
+	
 	int flip = 1;
 	
 	
