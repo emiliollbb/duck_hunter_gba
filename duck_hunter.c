@@ -28,6 +28,20 @@ OBJ_AFFINE *obj_aff_buffer= (OBJ_AFFINE*)obj_buffer;
 
 struct game_s game;
 
+void init_game(){
+    int i;
+    
+    for(i=0; i<4; i++) {
+		game.ducks[i].x=i*50;
+		game.ducks[i].y=32;
+	}
+	
+	for(i=0; i<2; i++) {
+		game.bullets[i].x=-10;
+		game.bullets[i].y=-10;
+	}
+}
+
 // testing a few sprite things
 // D-pad: move 
 // SELECT: switch palette
@@ -44,15 +58,7 @@ void obj_test()
 	int flip = 1;
 	
 	
-	for(i=0; i<4; i++) {
-		game.ducks[i].x=i*50;
-		game.ducks[i].y=32;
-	}
-	
-	for(i=0; i<2; i++) {
-		game.bullets[i].x=-10;
-		game.bullets[i].y=-10;
-	}
+	init_game();
 
 	OBJ_ATTR *ducks= &obj_buffer[0];
 	OBJ_ATTR *hunter= &obj_buffer[4];
