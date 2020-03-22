@@ -10,8 +10,14 @@
 #include "background.h"
 #include "duck.h"
 
+struct game_s {
+    int dx[4], dy[4], bx[2], by[2];
+};
+
 OBJ_ATTR obj_buffer[128];
 OBJ_AFFINE *obj_aff_buffer= (OBJ_AFFINE*)obj_buffer;
+
+struct game_s game;
 
 // testing a few sprite things
 // D-pad: move 
@@ -23,20 +29,20 @@ OBJ_AFFINE *obj_aff_buffer= (OBJ_AFFINE*)obj_buffer;
 void obj_test()
 {
 	int i=0, hx=0, hy=160-32-32;
-	int dx[4], dy[4], bx[2], by[2];
+	
 	u32 tid= 0, pb= 0;		// tile id, pal-bank
 	u32 frame = 0;
 	int flip = 1;
 	
 	
 	for(i=0; i<4; i++) {
-		dx[i]=i*50;
-		dy[i]=32;
+		game.dx[i]=i*50;
+		game.dy[i]=32;
 	}
 	
 	for(i=0; i<2; i++) {
-		bx[i]=-10;
-		by[i]=-10;
+		game.bx[i]=-10;
+		game.by[i]=-10;
 	}
 
 	OBJ_ATTR *ducks= &obj_buffer[0];
@@ -75,18 +81,18 @@ void obj_test()
 		hx += 2*key_tri_horz();
 		if(frame%2) {
 			for(i=0; i<4; i++) {
-				dx[i]++;
+				game.dx[i]++;
 			}
 		}
 		
 		for(i=0; i<2; i++) {
-			if(bx[i]>-10) {
-				bx[i]+=flip;
-				by[i]--;
+			if(game.bx[i]>-10) {
+				game.bx[i]+=flip;
+				game.by[i]--;
 			}
-			if(bx[i]>240 || by[i]<0 || bx[i]<-8) {
-				bx[i]=-10;
-				by[i]=-10;
+			if(game.bx[i]>240 || game.by[i]<0 || game.bx[i]<-8) {
+				game.bx[i]=-10;
+				game.by[i]=-10;
 			}
 		}
 
@@ -106,26 +112,26 @@ void obj_test()
 			flip=-1;
 		}
 		if(key_hit(KEY_A)) {
-			if(bx[0]<0) {
+			if(game.bx[0]<0) {
 				REG_SND1FREQ = SFREQ_RESET | SND_RATE(NOTE_C, -2);
-				by[0]=hy-5;
+				game.by[0]=hy-5;
 				if(flip==1) {
-					bx[0]=hx+25;
+					game.bx[0]=hx+25;
 				}
 				else {
-					bx[0]=hx;
+					game.bx[0]=hx;
 				}
 			}
 		}
 		if(key_hit(KEY_B)) {
-			if(bx[1]<0) {
+			if(game.bx[1]<0) {
 				REG_SND1FREQ = SFREQ_RESET | SND_RATE(NOTE_C, -2);
-				by[1]=hy-5;
+				game.by[1]=hy-5;
 				if(flip==1) {
-					bx[1]=hx+25;
+					game.bx[1]=hx+25;
 				}
 				else {
-					bx[1]=hx;
+					game.bx[1]=hx;
 				}
 			}
 		}
@@ -139,10 +145,10 @@ void obj_test()
 
 		for(i=0; i<4; i++) {
 			ducks[i].attr2= ATTR2_BUILD(frame/16%3*16, i%2, 0);
-			obj_set_pos(&ducks[i], dx[i], dy[i]);
+			obj_set_pos(&ducks[i], game.dx[i], game.dy[i]);
 		}
 		for(i=0; i<2; i++) {
-			obj_set_pos(&bullets[i], bx[i], by[i]);
+			obj_set_pos(&bullets[i], game.bx[i], game.by[i]);
 		}
 		
 		
