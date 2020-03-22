@@ -14,10 +14,18 @@ struct cinematic_s {
     int x,y;
 };
 
+struct bullet_s {
+    int x,y,vx;
+};
+
+struct hunter_s {
+    int x,y, flip;
+};
+
 struct game_s {
     struct cinematic_s ducks[4];
-    struct cinematic_s bullets[2];
-    struct cinematic_s hunter;
+    struct bullet_s bullets[2];
+    struct hunter_s hunter;
 };
 
 OBJ_ATTR obj_buffer[128];
@@ -41,6 +49,7 @@ void inline init_game(){
     
     game.hunter.x=0;
     game.hunter.y=160-32-32;
+    game.hunter.flip=1;
 }
 
 // testing a few sprite things
@@ -54,8 +63,7 @@ void obj_test()
 {
 	int i=0;
 	
-	int flip = 1;
-	
+		
 	
 	init_game();
 
@@ -101,7 +109,7 @@ void obj_test()
 		
 		for(i=0; i<2; i++) {
 			if(game.bullets[i].x>-10) {
-				game.bullets[i].x+=flip;
+				game.bullets[i].x+=game.bullets[i].vx;
 				game.bullets[i].y--;
 			}
 			if(game.bullets[i].x>240 || game.bullets[i].y<0 || game.bullets[i].x<-8) {
@@ -116,17 +124,18 @@ void obj_test()
 		// flip
 		if(key_hit(KEY_R)) {
 			hunter->attr1 &= ~ATTR1_HFLIP;
-			flip=1;
+			game.hunter.flip=1;
 		}
 		if(key_hit(KEY_L)) {
 			hunter->attr1 |= ATTR1_HFLIP;
-			flip=-1;
+			game.hunter.flip=-1;
 		}
 		if(key_hit(KEY_A)) {
 			if(game.bullets[0].x<0) {
 				REG_SND1FREQ = SFREQ_RESET | SND_RATE(NOTE_C, -2);
 				game.bullets[0].y=game.hunter.y-5;
-				if(flip==1) {
+                game.bullets[0].vx=game.hunter.flip;
+				if(game.hunter.flip==1) {
 					game.bullets[0].x=game.hunter.x+25;
 				}
 				else {
@@ -138,7 +147,8 @@ void obj_test()
 			if(game.bullets[1].x<0) {
 				REG_SND1FREQ = SFREQ_RESET | SND_RATE(NOTE_C, -2);
 				game.bullets[1].y=game.hunter.y-5;
-				if(flip==1) {
+                game.bullets[1].vx=game.hunter.flip;
+				if(game.hunter.flip==1) {
 					game.bullets[1].x=game.hunter.x+25;
 				}
 				else {
