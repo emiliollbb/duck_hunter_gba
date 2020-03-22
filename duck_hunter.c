@@ -20,6 +20,7 @@ struct bullet_s {
 
 struct hunter_s {
     int x,y, flip;
+    OBJ_ATTR *object;
 };
 
 struct game_s {
@@ -68,7 +69,7 @@ void obj_test()
 	init_game();
 
 	OBJ_ATTR *ducks= &obj_buffer[0];
-	OBJ_ATTR *hunter= &obj_buffer[4];
+	game.hunter.object= &obj_buffer[4];
 	OBJ_ATTR *bullets= &obj_buffer[5];
 	
 	for(i=0; i<4; i++) {
@@ -79,7 +80,7 @@ void obj_test()
 	}
 
 	
-	obj_set_attr(hunter, 
+	obj_set_attr(game.hunter.object, 
 		ATTR0_SQUARE,
 		ATTR1_SIZE_32,
 		ATTR2_PALBANK(0) | (16*3));		// palbank 0, tile 0
@@ -91,7 +92,7 @@ void obj_test()
 			ATTR2_PALBANK(0) | (16*4));
 	}
 
-	obj_set_pos(hunter, game.hunter.x, game.hunter.y);
+	obj_set_pos(game.hunter.object, game.hunter.x, game.hunter.y);
 
 	while(1)
 	{
@@ -123,11 +124,11 @@ void obj_test()
 
 		// flip
 		if(key_hit(KEY_R)) {
-			hunter->attr1 &= ~ATTR1_HFLIP;
+			game.hunter.object->attr1 &= ~ATTR1_HFLIP;
 			game.hunter.flip=1;
 		}
 		if(key_hit(KEY_L)) {
-			hunter->attr1 |= ATTR1_HFLIP;
+			game.hunter.object->attr1 |= ATTR1_HFLIP;
 			game.hunter.flip=-1;
 		}
 		if(key_hit(KEY_A)) {
@@ -170,7 +171,7 @@ void obj_test()
 		}
 		
 		
-		obj_set_pos(hunter, game.hunter.x, game.hunter.y);
+		obj_set_pos(game.hunter.object, game.hunter.x, game.hunter.y);
 
 		oam_copy(oam_mem, obj_buffer, 7);	// only need to update one
 	}
