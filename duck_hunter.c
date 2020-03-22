@@ -10,7 +10,12 @@
 #include "background.h"
 #include "duck.h"
 
+struct duck_s {
+    int x,y;
+};
+
 struct game_s {
+    struct duck_s ducks[4];
     int dx[4], dy[4], bx[2], by[2];
 };
 
@@ -36,8 +41,8 @@ void obj_test()
 	
 	
 	for(i=0; i<4; i++) {
-		game.dx[i]=i*50;
-		game.dy[i]=32;
+		game.ducks[i].x=i*50;
+		game.ducks[i].y=32;
 	}
 	
 	for(i=0; i<2; i++) {
@@ -81,7 +86,7 @@ void obj_test()
 		hx += 2*key_tri_horz();
 		if(frame%2) {
 			for(i=0; i<4; i++) {
-				game.dx[i]++;
+				game.ducks[i].x++;
 			}
 		}
 		
@@ -145,7 +150,7 @@ void obj_test()
 
 		for(i=0; i<4; i++) {
 			ducks[i].attr2= ATTR2_BUILD(frame/16%3*16, i%2, 0);
-			obj_set_pos(&ducks[i], game.dx[i], game.dy[i]);
+			obj_set_pos(&ducks[i], game.ducks[i].x, game.ducks[i].y);
 		}
 		for(i=0; i<2; i++) {
 			obj_set_pos(&bullets[i], game.bx[i], game.by[i]);
