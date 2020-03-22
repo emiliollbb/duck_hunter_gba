@@ -13,12 +13,15 @@
 #define DUCKS_SIZE 4
 #define BULLETS_SIZE 2
 
-struct cinematic_s {
+
+struct duck_s {
     int x,y;
+    OBJ_ATTR *object;
 };
 
 struct bullet_s {
     int x,y,vx;
+    OBJ_ATTR *object;
 };
 
 struct hunter_s {
@@ -27,9 +30,10 @@ struct hunter_s {
 };
 
 struct game_s {
-    struct cinematic_s ducks[DUCKS_SIZE];
+    struct duck_s ducks[DUCKS_SIZE];
     struct bullet_s bullets[2];
     struct hunter_s hunter;
+    int objects;
 };
 
 OBJ_ATTR obj_buffer[128];
@@ -38,23 +42,27 @@ OBJ_AFFINE *obj_aff_buffer= (OBJ_AFFINE*)obj_buffer;
 struct game_s game;
 u32 frame = 0;
 
-void inline init_game(){
-    int i;
+void init_game() {
+    int i=0;
+    game.objects=0;
     
     for(i=0; i<DUCKS_SIZE; i++) {
 		game.ducks[i].x=i*50;
 		game.ducks[i].y=32;
-	}
-	
-	for(i=0; i<BULLETS_SIZE; i++) {
-		game.bullets[i].x=-10;
-		game.bullets[i].y=-10;
+        game.ducks[i].object=&obj_buffer[game.objects++];
 	}
     
     game.hunter.x=0;
     game.hunter.y=160-32-32;
     game.hunter.flip=1;
-    game.hunter.object=&obj_buffer[DUCKS_SIZE];
+    game.hunter.object=&obj_buffer[game.objects++];
+    	
+	for(i=0; i<BULLETS_SIZE; i++) {
+		game.bullets[i].x=-10;
+		game.bullets[i].y=-10;
+        game.bullets[i].object=&obj_buffer[game.objects++];
+	}
+    
 }
 
 // testing a few sprite things
@@ -71,12 +79,9 @@ void obj_test()
 		
 	
 	init_game();
-
-	OBJ_ATTR *ducks= &obj_buffer[0];
-	OBJ_ATTR *bullets= &obj_buffer[5];
 	
 	for(i=0; i<DUCKS_SIZE; i++) {
-		obj_set_attr(&ducks[i], 
+		obj_set_attr(game.ducks[i].object, 
 			ATTR0_SQUARE,
 			ATTR1_SIZE_32,
 			ATTR2_PALBANK(0) | 0);
@@ -89,7 +94,7 @@ void obj_test()
 		ATTR2_PALBANK(0) | (16*3));		// palbank 0, tile 0
 
 	for(i=0; i<BULLETS_SIZE; i++) {
-		obj_set_attr(&bullets[i], 
+		obj_set_attr(game.bullets[i].object, 
 			ATTR0_SQUARE,
 			ATTR1_SIZE_8,
 			ATTR2_PALBANK(0) | (16*4));
@@ -166,17 +171,17 @@ void obj_test()
 			REG_DISPCNT ^= DCNT_OBJ_1D;
 
 		for(i=0; i<DUCKS_SIZE; i++) {
-			ducks[i].attr2= ATTR2_BUILD(frame/16%3*16, i%2, 0);
-			obj_set_pos(&ducks[i], game.ducks[i].x, game.ducks[i].y);
+			game.ducks[i].object->attr2= ATTR2_BUILD(frame/16%3*16, i%2, 0);
+			obj_set_pos(game.ducks[i].object, game.ducks[i].x, game.ducks[i].y);
 		}
 		for(i=0; i<BULLETS_SIZE; i++) {
-			obj_set_pos(&bullets[i], game.bullets[i].x, game.bullets[i].y);
+			obj_set_pos(game.bullets[i].object, game.bullets[i].x, game.bullets[i].y);
 		}
 		
 		
 		obj_set_pos(game.hunter.object, game.hunter.x, game.hunter.y);
 
-		oam_copy(oam_mem, obj_buffer, 7);	// only need to update one
+		oam_copy(oam_mem, obj_buffer, game.objects);	// only need to update one
 	}
 }
 
