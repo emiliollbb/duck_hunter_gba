@@ -10,17 +10,14 @@
 #include "background.h"
 #include "duck.h"
 
-struct duck_s {
-    int x,y;
-};
-
-struct bullet_s {
+struct cinematic_s {
     int x,y;
 };
 
 struct game_s {
-    struct duck_s ducks[4];
-    struct bullet_s bullets[2];
+    struct cinematic_s ducks[4];
+    struct cinematic_s bullets[2];
+    struct cinematic_s hunter;
 };
 
 OBJ_ATTR obj_buffer[128];
@@ -41,6 +38,9 @@ void inline init_game(){
 		game.bullets[i].x=-10;
 		game.bullets[i].y=-10;
 	}
+    
+    game.hunter.x=0;
+    game.hunter.y=160-32-32;
 }
 
 // testing a few sprite things
@@ -52,9 +52,9 @@ void inline init_game(){
 // L & R shift starting tile
 void obj_test()
 {
-	int i=0, hx=0, hy=160-32-32;
+	int i=0;
 	
-	u32 tid= 0, pb= 0;		// tile id, pal-bank
+	u32 tid= 0;		// tile id, pal-bank
 	
 	int flip = 1;
 	
@@ -69,7 +69,7 @@ void obj_test()
 		obj_set_attr(&ducks[i], 
 			ATTR0_SQUARE,
 			ATTR1_SIZE_32,
-			ATTR2_PALBANK(pb) | tid);
+			ATTR2_PALBANK(0) | tid);
 	}
 
 	
@@ -85,7 +85,7 @@ void obj_test()
 			ATTR2_PALBANK(0) | (16*4));
 	}
 
-	obj_set_pos(hunter, hx, hy);
+	obj_set_pos(hunter, game.hunter.x, game.hunter.y);
 
 	while(1)
 	{
@@ -94,7 +94,7 @@ void obj_test()
 		key_poll();
 
 		// move left/right
-		hx += 2*key_tri_horz();
+		game.hunter.x += 2*key_tri_horz();
 		if(frame%2) {
 			for(i=0; i<4; i++) {
 				game.ducks[i].x++;
@@ -113,7 +113,7 @@ void obj_test()
 		}
 
 		// move up/down
-		//hy += 2*key_tri_vert();
+		//game.hunter.y += 2*key_tri_vert();
 
 		// increment/decrement starting tile with R/L
 		tid += bit_tribool(key_hit(-1), KI_R, KI_L);
@@ -130,31 +130,28 @@ void obj_test()
 		if(key_hit(KEY_A)) {
 			if(game.bullets[0].x<0) {
 				REG_SND1FREQ = SFREQ_RESET | SND_RATE(NOTE_C, -2);
-				game.bullets[0].y=hy-5;
+				game.bullets[0].y=game.hunter.y-5;
 				if(flip==1) {
-					game.bullets[0].x=hx+25;
+					game.bullets[0].x=game.hunter.x+25;
 				}
 				else {
-					game.bullets[0].x=hx;
+					game.bullets[0].x=game.hunter.x;
 				}
 			}
 		}
 		if(key_hit(KEY_B)) {
 			if(game.bullets[1].x<0) {
 				REG_SND1FREQ = SFREQ_RESET | SND_RATE(NOTE_C, -2);
-				game.bullets[1].y=hy-5;
+				game.bullets[1].y=game.hunter.y-5;
 				if(flip==1) {
-					game.bullets[1].x=hx+25;
+					game.bullets[1].x=game.hunter.x+25;
 				}
 				else {
-					game.bullets[1].x=hx;
+					game.bullets[1].x=game.hunter.x;
 				}
 			}
 		}
 		
-		// make it glow (via palette swapping)
-		pb= key_is_down(KEY_SELECT) ? 1 : 0;
-
 		// toggle mapping mode
 		if(key_hit(KEY_START))
 			REG_DISPCNT ^= DCNT_OBJ_1D;
@@ -168,7 +165,7 @@ void obj_test()
 		}
 		
 		
-		obj_set_pos(hunter, hx, hy);
+		obj_set_pos(hunter, game.hunter.x, game.hunter.y);
 
 		oam_copy(oam_mem, obj_buffer, 7);	// only need to update one
 	}
