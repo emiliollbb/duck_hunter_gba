@@ -15,7 +15,7 @@
 
 
 struct duck_s {
-    int x,y;
+    int x,y,vx,vy;
     OBJ_ATTR *object;
 };
 
@@ -49,6 +49,8 @@ void init_game() {
     for(i=0; i<DUCKS_SIZE; i++) {
 		game.ducks[i].x=i*50;
 		game.ducks[i].y=32;
+        game.ducks[i].vx=1;
+        game.ducks[i].vy=0;
         game.ducks[i].object=&obj_buffer[game.objects++];
         obj_set_attr(game.ducks[i].object, 
 			ATTR0_SQUARE,
@@ -105,7 +107,7 @@ void update_game() {
 		game.hunter.x += 2*key_tri_horz();
 		if(game.frame%2) {
 			for(i=0; i<4; i++) {
-				game.ducks[i].x++;
+				game.ducks[i].x+=game.ducks[i].vx;
 			}
 		}
 		
