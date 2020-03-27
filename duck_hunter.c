@@ -34,6 +34,7 @@ struct game_s {
     struct bullet_s bullets[2];
     struct hunter_s hunter;
     int objects;
+    int frame;
 };
 
 OBJ_ATTR obj_buffer[128];
@@ -109,7 +110,7 @@ void obj_test()
 	init_game();
 	
 
-	obj_set_pos(game.hunter.object, game.hunter.x, game.hunter.y);
+	//obj_set_pos(game.hunter.object, game.hunter.x, game.hunter.y);
 
 	while(1)
 	{
@@ -189,66 +190,63 @@ void obj_test()
 	}
 }
 
-int main()
-{
-	// Init interrupts, and enable VBlank irq
-	irq_init(NULL);
-	irq_add(II_VBLANK, NULL);
-	
-	// turn sound on
+void init_sound() {
+    // turn sound on
 	REG_SNDSTAT= SSTAT_ENABLE;
 	// snd1 on left/right ; both full volume
 	REG_SNDDMGCNT = SDMG_BUILD_LR(SDMG_SQR1, 7);
 	// DMG ratio to 100%
 	REG_SNDDSCNT= SDS_DMG100;
-
 	// no sweep
 	REG_SND1SWEEP= SSW_OFF;
 	// envelope: vol=12, decay, max step time (7) ; 50% duty
 	REG_SND1CNT= SSQR_ENV_BUILD(12, 0, 1) | SSQR_DUTY1_2;
 	REG_SND1FREQ= 0;
-	
-	// Load palette
+}
+
+void load_background() {
+    // Load palette
 	memcpy(pal_bg_mem, backgroundPal, backgroundPalLen);
 	// Load tiles into CBB 0
 	memcpy(&tile_mem[0][0], backgroundTiles, backgroundTilesLen);
 	// Load map into SBB 30
 	memcpy(&se_mem[30][0], backgroundMap, backgroundMapLen);
 	
-	
-	
-	// Load ducks sprites
+}
+
+void load_sprites() {
+    // Load ducks sprites
 	memcpy(pal_obj_mem, duckPal, duckPalLen);
 	memcpy(&tile_mem[4][0], duckTiles, duckTilesLen);
-
 	oam_init(obj_buffer, 128);
 	
-	//REG_DISPCNT= DCNT_OBJ | DCNT_OBJ_1D;
-	
-	
+}
 
+int main()
+{
+	// Init interrupts, and enable VBlank irq
+	irq_init(NULL);
+	irq_add(II_VBLANK, NULL);
+	
+	init_sound();
+	
+	load_background();
+	
+	load_sprites();
+	
+	
 	// set up BG0 for a 4bpp 64x32t map, using
 	//   using charblock 0 and screenblock 31
 	REG_BG0CNT= BG_CBB(0) | BG_SBB(30) | BG_4BPP | BG_REG_64x32;
 	REG_DISPCNT= DCNT_MODE0 | DCNT_BG0 | DCNT_OBJ | DCNT_OBJ_1D;
-	
+	// Backround H scroll
 	REG_BG0HOFS= 0;
+    // Background V scroll
 	REG_BG0VOFS= 0;
 	
 	obj_test();
 
-	// Scroll around some
-	int x= 192, y= 64;
-	while(1)
-	{
-		vid_vsync();
-		key_poll();
-
-		x += key_tri_horz();
-		y += key_tri_vert();
-
-		
-	}
+	
 
 	return 0;
 }
