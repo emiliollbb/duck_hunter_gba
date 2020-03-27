@@ -84,7 +84,14 @@ void render_frame() {
     int i;
     
     for(i=0; i<DUCKS_SIZE; i++) {
-        game.ducks[i].object->attr2= ATTR2_BUILD(game.frame/16%3*16, i%2, 0);
+        // Duck flying
+        if(game.ducks[i].vx>0) {
+            game.ducks[i].object->attr2= ATTR2_BUILD(game.frame/16%3*16, i%2, 0);
+        }
+        else if(game.ducks[i].vx==0) {
+            game.ducks[i].object->attr2= ATTR2_BUILD(5*16, i%2, 0);
+        }
+        
         obj_set_pos(game.ducks[i].object, game.ducks[i].x, game.ducks[i].y);
     }
     for(i=0; i<BULLETS_SIZE; i++) {
@@ -131,8 +138,8 @@ void update_game() {
         {
           if(
           //game.bullets[i].e && game.ducks[j].e &&
-        (game.bullets[i].x-game.ducks[j].x) * (game.bullets[i].x-game.ducks[j].x) < 64
-        && (game.bullets[i].y-game.ducks[j].y) * (game.bullets[i].y-game.ducks[j].y) < 64)
+        (game.bullets[i].x-game.ducks[j].x) * (game.bullets[i].x-game.ducks[j].x) < 128
+        && (game.bullets[i].y-game.ducks[j].y) * (game.bullets[i].y-game.ducks[j].y) < 128)
           {
         game.ducks[j].shoot_time=game.frame;
         game.ducks[j].vx=0;
