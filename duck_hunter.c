@@ -87,6 +87,10 @@ void render_frame() {
     for(i=0; i<BULLETS_SIZE; i++) {
         obj_set_pos(game.bullets[i].object, game.bullets[i].x, game.bullets[i].y);
     }
+    
+    obj_set_pos(game.hunter.object, game.hunter.x, game.hunter.y);
+
+    oam_copy(oam_mem, obj_buffer, game.objects);
 }
 
 // testing a few sprite things
@@ -181,9 +185,7 @@ void obj_test()
 		render_frame();
 		
 		
-		obj_set_pos(game.hunter.object, game.hunter.x, game.hunter.y);
-
-		oam_copy(oam_mem, obj_buffer, game.objects);	// only need to update one
+		
 	}
 }
 
