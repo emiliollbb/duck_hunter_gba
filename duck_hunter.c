@@ -34,14 +34,13 @@ struct game_s {
     struct bullet_s bullets[2];
     struct hunter_s hunter;
     int objects;
-    int frame;
+    u32 frame;
 };
 
 OBJ_ATTR obj_buffer[128];
 OBJ_AFFINE *obj_aff_buffer= (OBJ_AFFINE*)obj_buffer;
 
 struct game_s game;
-u32 frame = 0;
 
 void init_game() {
     int i=0;
@@ -82,7 +81,7 @@ void render_frame() {
     int i;
     
     for(i=0; i<DUCKS_SIZE; i++) {
-        game.ducks[i].object->attr2= ATTR2_BUILD(frame/16%3*16, i%2, 0);
+        game.ducks[i].object->attr2= ATTR2_BUILD(game.frame/16%3*16, i%2, 0);
         obj_set_pos(game.ducks[i].object, game.ducks[i].x, game.ducks[i].y);
     }
     for(i=0; i<BULLETS_SIZE; i++) {
@@ -115,12 +114,12 @@ void obj_test()
 	while(1)
 	{
 		VBlankIntrWait();
-		frame++;
+		game.frame++;
 		key_poll();
 
 		// move left/right
 		game.hunter.x += 2*key_tri_horz();
-		if(frame%2) {
+		if(game.frame%2) {
 			for(i=0; i<4; i++) {
 				game.ducks[i].x++;
 			}
@@ -212,6 +211,15 @@ void load_background() {
 	// Load map into SBB 30
 	memcpy(&se_mem[30][0], backgroundMap, backgroundMapLen);
 	
+    // set up BG0 for a 4bpp 64x32t map, using
+	//   using charblock 0 and screenblock 31
+	REG_BG0CNT= BG_CBB(0) | BG_SBB(30) | BG_4BPP | BG_REG_64x32;
+	
+	// Backround H scroll
+	REG_BG0HOFS= 0;
+    // Background V scroll
+	REG_BG0VOFS= 0;
+	
 }
 
 void load_sprites() {
@@ -233,17 +241,11 @@ int main()
 	load_background();
 	
 	load_sprites();
-	
-	
-	// set up BG0 for a 4bpp 64x32t map, using
-	//   using charblock 0 and screenblock 31
-	REG_BG0CNT= BG_CBB(0) | BG_SBB(30) | BG_4BPP | BG_REG_64x32;
-	REG_DISPCNT= DCNT_MODE0 | DCNT_BG0 | DCNT_OBJ | DCNT_OBJ_1D;
-	// Backround H scroll
-	REG_BG0HOFS= 0;
-    // Background V scroll
-	REG_BG0VOFS= 0;
-	
+		
+    // Init Display
+    REG_DISPCNT= DCNT_MODE0 | DCNT_BG0 | DCNT_OBJ | DCNT_OBJ_1D;
+    
+    
 	obj_test();
 
 	
