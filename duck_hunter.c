@@ -93,31 +93,9 @@ void render_frame() {
     oam_copy(oam_mem, obj_buffer, game.objects);
 }
 
-// testing a few sprite things
-// D-pad: move 
-// SELECT: switch palette
-// START: toggle mapping mode
-// A: horizontal flip
-// B: vertical flip
-// L & R shift starting tile
-void obj_test()
-{
-	int i=0;
-	
-		
-	
-	init_game();
-	
-
-	//obj_set_pos(game.hunter.object, game.hunter.x, game.hunter.y);
-
-	while(1)
-	{
-		VBlankIntrWait();
-		game.frame++;
-		key_poll();
-
-		// move left/right
+void update_game() {
+    int i;
+    // move left/right
 		game.hunter.x += 2*key_tri_horz();
 		if(game.frame%2) {
 			for(i=0; i<4; i++) {
@@ -182,6 +160,33 @@ void obj_test()
 			            
         }
 
+}
+
+// testing a few sprite things
+// D-pad: move 
+// SELECT: switch palette
+// START: toggle mapping mode
+// A: horizontal flip
+// B: vertical flip
+// L & R shift starting tile
+void obj_test()
+{
+	
+	
+		
+	
+	init_game();
+	
+
+	//obj_set_pos(game.hunter.object, game.hunter.x, game.hunter.y);
+
+	while(1)
+	{
+		VBlankIntrWait();
+		game.frame++;
+		key_poll();
+
+		update_game();
 		render_frame();
 		
 		
