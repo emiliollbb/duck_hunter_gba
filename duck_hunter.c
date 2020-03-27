@@ -48,10 +48,11 @@ void init_game() {
     game.objects=0;
     
     for(i=0; i<DUCKS_SIZE; i++) {
-		game.ducks[i].x=i*50;
+		game.ducks[i].x=i*50-200;
 		game.ducks[i].y=32;
         game.ducks[i].vx=1;
         game.ducks[i].vy=0;
+        game.ducks[i].e=1;
         game.ducks[i].object=&obj_buffer[game.objects++];
         obj_set_attr(game.ducks[i].object, 
 			ATTR0_SQUARE,
@@ -71,6 +72,7 @@ void init_game() {
 	for(i=0; i<BULLETS_SIZE; i++) {
 		game.bullets[i].x=-10;
 		game.bullets[i].y=-10;
+        game.bullets[i].e=0;
         game.bullets[i].object=&obj_buffer[game.objects++];
         obj_set_attr(game.bullets[i].object, 
 			ATTR0_SQUARE,
@@ -115,8 +117,10 @@ void update_game() {
 		game.hunter.x += 2*key_tri_horz();
 		if(game.frame%2) {
 			for(i=0; i<DUCKS_SIZE; i++) {
-				game.ducks[i].x+=game.ducks[i].vx;
-                game.ducks[i].y+=game.ducks[i].vy;
+                if(game.ducks[i].x<240 && game.ducks[i].y<160) {
+                    game.ducks[i].x+=game.ducks[i].vx;
+                    game.ducks[i].y+=game.ducks[i].vy;
+                }
 			}
 		}
 		
@@ -137,13 +141,13 @@ void update_game() {
         for(j=0; j<DUCKS_SIZE; j++)
         {
           if(
-          //game.bullets[i].e && game.ducks[j].e &&
-        (game.bullets[i].x-game.ducks[j].x) * (game.bullets[i].x-game.ducks[j].x) < 128
-        && (game.bullets[i].y-game.ducks[j].y) * (game.bullets[i].y-game.ducks[j].y) < 128)
+          game.bullets[i].e && game.ducks[j].e &&
+        (game.bullets[i].x-game.ducks[j].x+16) * (game.bullets[i].x-game.ducks[j].x+16) < 25*25
+        && (game.bullets[i].y-game.ducks[j].y+4) * (game.bullets[i].y-game.ducks[j].y+4) < 25*25)
           {
         game.ducks[j].shoot_time=game.frame;
         game.ducks[j].vx=0;
-        game.ducks[j].vy=1;
+        game.ducks[j].vy=3;
         game.hunter.score++;
         game.bullets[i].e=0;
           }
@@ -166,6 +170,7 @@ void update_game() {
 				game.bullets[0].y=game.hunter.y-5;
                 game.bullets[0].vx=game.hunter.flip;
                 game.bullets[0].vy=-1;
+                game.bullets[0].e=1;
 				if(game.hunter.flip==1) {
 					game.bullets[0].x=game.hunter.x+25;
 				}
@@ -180,6 +185,7 @@ void update_game() {
 				game.bullets[1].y=game.hunter.y-5;
                 game.bullets[1].vx=game.hunter.flip;
 				game.bullets[1].vy=-1;
+                game.bullets[1].e=1;
                 if(game.hunter.flip==1) {
 					game.bullets[1].x=game.hunter.x+25;
 				}
@@ -191,9 +197,13 @@ void update_game() {
 		
 		// toggle mapping mode
 		if(key_hit(KEY_START)) {
-			            
+            for(i=0; i<DUCKS_SIZE; i++) {
+                game.ducks[i].x=i*50-200;
+                game.ducks[i].y=32;
+                game.ducks[i].vx=1;
+                game.ducks[i].vy=0;
+            }
         }
-
 }
 
 
