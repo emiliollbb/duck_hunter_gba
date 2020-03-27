@@ -15,17 +15,18 @@
 
 
 struct duck_s {
-    int x,y,vx,vy;
+    int e,x,y,vx,vy;
+    u32 shoot_time;
     OBJ_ATTR *object;
 };
 
 struct bullet_s {
-    int x,y,vx,vy;
+    int e,x,y,vx,vy;
     OBJ_ATTR *object;
 };
 
 struct hunter_s {
-    int x,y, flip;
+    int x,y, flip, score;
     OBJ_ATTR *object;
 };
 
@@ -102,12 +103,13 @@ void render_frame() {
 }
 
 void update_game() {
-    int i;
+    int i,j;
     // move left/right
 		game.hunter.x += 2*key_tri_horz();
 		if(game.frame%2) {
-			for(i=0; i<4; i++) {
+			for(i=0; i<DUCKS_SIZE; i++) {
 				game.ducks[i].x+=game.ducks[i].vx;
+                game.ducks[i].y+=game.ducks[i].vy;
 			}
 		}
 		
@@ -121,6 +123,25 @@ void update_game() {
 				game.bullets[i].y=-10;
 			}
 		}
+        
+        // Check collisions
+      for(i=0; i<BULLETS_SIZE; i++)
+      {
+        for(j=0; j<DUCKS_SIZE; j++)
+        {
+          if(
+          //game.bullets[i].e && game.ducks[j].e &&
+        (game.bullets[i].x-game.ducks[j].x) * (game.bullets[i].x-game.ducks[j].x) < 64
+        && (game.bullets[i].y-game.ducks[j].y) * (game.bullets[i].y-game.ducks[j].y) < 64)
+          {
+        game.ducks[j].shoot_time=game.frame;
+        game.ducks[j].vx=0;
+        game.ducks[j].vy=1;
+        game.hunter.score++;
+        game.bullets[i].e=0;
+          }
+        }
+      }
 
 		// move up/down
 		//game.hunter.y += 2*key_tri_vert();
