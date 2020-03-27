@@ -166,37 +166,6 @@ void update_game() {
 
 }
 
-// testing a few sprite things
-// D-pad: move 
-// SELECT: switch palette
-// START: toggle mapping mode
-// A: horizontal flip
-// B: vertical flip
-// L & R shift starting tile
-void obj_test()
-{
-	
-	
-		
-	
-	init_game();
-	
-
-	//obj_set_pos(game.hunter.object, game.hunter.x, game.hunter.y);
-
-	while(1)
-	{
-		VBlankIntrWait();
-		game.frame++;
-		key_poll();
-
-		update_game();
-		render_frame();
-		
-		
-		
-	}
-}
 
 void init_sound() {
     // turn sound on
@@ -255,9 +224,17 @@ int main()
     REG_DISPCNT= DCNT_MODE0 | DCNT_BG0 | DCNT_OBJ | DCNT_OBJ_1D;
     
     
-	obj_test();
-
+	init_game();
 	
+	while(1)
+	{
+		VBlankIntrWait();
+		game.frame++;
+		key_poll();
+
+		update_game();
+		render_frame();
+	}
 
 	return 0;
 }
