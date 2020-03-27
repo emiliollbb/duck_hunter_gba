@@ -88,6 +88,12 @@ void render_frame() {
         obj_set_pos(game.bullets[i].object, game.bullets[i].x, game.bullets[i].y);
     }
     
+    if(game.hunter.flip==1) {
+        game.hunter.object->attr1 &= ~ATTR1_HFLIP;
+    }
+    else if(game.hunter.flip==-1) {
+        game.hunter.object->attr1 |= ATTR1_HFLIP;
+    }
     obj_set_pos(game.hunter.object, game.hunter.x, game.hunter.y);
 
     oam_copy(oam_mem, obj_buffer, game.objects);
@@ -119,11 +125,9 @@ void update_game() {
 
 		// flip
 		if(key_hit(KEY_R)) {
-			game.hunter.object->attr1 &= ~ATTR1_HFLIP;
 			game.hunter.flip=1;
 		}
 		if(key_hit(KEY_L)) {
-			game.hunter.object->attr1 |= ATTR1_HFLIP;
 			game.hunter.flip=-1;
 		}
 		if(key_hit(KEY_A)) {
