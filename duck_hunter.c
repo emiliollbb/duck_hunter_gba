@@ -20,7 +20,7 @@ struct duck_s {
 };
 
 struct bullet_s {
-    int x,y,vx;
+    int x,y,vx,vy;
     OBJ_ATTR *object;
 };
 
@@ -124,7 +124,7 @@ void obj_test()
 		for(i=0; i<BULLETS_SIZE; i++) {
 			if(game.bullets[i].x>-10) {
 				game.bullets[i].x+=game.bullets[i].vx;
-				game.bullets[i].y--;
+				game.bullets[i].y+=game.bullets[i].vy;
 			}
 			if(game.bullets[i].x>240 || game.bullets[i].y<0 || game.bullets[i].x<-8) {
 				game.bullets[i].x=-10;
@@ -149,6 +149,7 @@ void obj_test()
 				REG_SND1FREQ = SFREQ_RESET | SND_RATE(NOTE_C, -2);
 				game.bullets[0].y=game.hunter.y-5;
                 game.bullets[0].vx=game.hunter.flip;
+                game.bullets[0].vy=-1;
 				if(game.hunter.flip==1) {
 					game.bullets[0].x=game.hunter.x+25;
 				}
@@ -162,7 +163,8 @@ void obj_test()
 				REG_SND1FREQ = SFREQ_RESET | SND_RATE(NOTE_C, -2);
 				game.bullets[1].y=game.hunter.y-5;
                 game.bullets[1].vx=game.hunter.flip;
-				if(game.hunter.flip==1) {
+				game.bullets[1].vy=-1;
+                if(game.hunter.flip==1) {
 					game.bullets[1].x=game.hunter.x+25;
 				}
 				else {
