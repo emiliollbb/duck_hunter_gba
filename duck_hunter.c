@@ -145,11 +145,12 @@ void update_game() {
         (game.bullets[i].x-game.ducks[j].x+16) * (game.bullets[i].x-game.ducks[j].x+16) < 25*25
         && (game.bullets[i].y-game.ducks[j].y+4) * (game.bullets[i].y-game.ducks[j].y+4) < 25*25)
           {
-        game.ducks[j].shoot_time=game.frame;
-        game.ducks[j].vx=0;
-        game.ducks[j].vy=3;
-        game.hunter.score++;
-        game.bullets[i].e=0;
+              REG_SND1FREQ = SFREQ_RESET | SND_RATE(NOTE_C, -2);
+              game.ducks[j].shoot_time=game.frame;
+              game.ducks[j].vx=0;
+              game.ducks[j].vy=3;
+              game.hunter.score++;
+              game.bullets[i].e=0;
           }
         }
       }
@@ -166,7 +167,7 @@ void update_game() {
 		}
 		if(key_hit(KEY_A)) {
 			if(game.bullets[0].x<0) {
-				REG_SND1FREQ = SFREQ_RESET | SND_RATE(NOTE_C, -2);
+				REG_SND4FREQ = SFREQ_RESET | SND_RATE(NOTE_C, -3);
 				game.bullets[0].y=game.hunter.y-5;
                 game.bullets[0].vx=game.hunter.flip;
                 game.bullets[0].vy=-1;
@@ -181,7 +182,7 @@ void update_game() {
 		}
 		if(key_hit(KEY_B)) {
 			if(game.bullets[1].x<0) {
-				REG_SND1FREQ = SFREQ_RESET | SND_RATE(NOTE_C, -2);
+				REG_SND4FREQ = SFREQ_RESET | SND_RATE(NOTE_C, -3);
 				game.bullets[1].y=game.hunter.y-5;
                 game.bullets[1].vx=game.hunter.flip;
 				game.bullets[1].vy=-1;
@@ -195,7 +196,6 @@ void update_game() {
 			}
 		}
 		
-		// toggle mapping mode
 		if(key_hit(KEY_START)) {
             for(i=0; i<DUCKS_SIZE; i++) {
                 game.ducks[i].x=i*50-200;
@@ -211,7 +211,7 @@ void init_sound() {
     // turn sound on
 	REG_SNDSTAT= SSTAT_ENABLE;
 	// snd1 on left/right ; both full volume
-	REG_SNDDMGCNT = SDMG_BUILD_LR(SDMG_SQR1, 7);
+	REG_SNDDMGCNT = SDMG_BUILD_LR(SDMG_SQR1 | SDMG_NOISE, 7);
 	// DMG ratio to 100%
 	REG_SNDDSCNT= SDS_DMG100;
 	// no sweep
@@ -219,6 +219,8 @@ void init_sound() {
 	// envelope: vol=12, decay, max step time (7) ; 50% duty
 	REG_SND1CNT= SSQR_ENV_BUILD(12, 0, 1) | SSQR_DUTY1_2;
 	REG_SND1FREQ= 0;
+    REG_SND4CNT= SSQR_ENV_BUILD(12, 0, 1) | SSQR_DUTY1_2;
+	REG_SND4FREQ= 0;
 }
 
 void load_background() {
