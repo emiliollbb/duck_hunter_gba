@@ -14,7 +14,7 @@ PATH := $(DEVKITARM)/bin:$(PATH)
 PROJ    := duck_hunter
 TITLE   := $(PROJ)
 
-LIBTONC	:= /C/tonc/code/tonclib
+# Setup Environment var LIBTONC to /C/tonc/code/tonclib
 INCLUDE  := -I$(LIBTONC)/include
 LIBPATHS := -L$(LIBTONC)/lib
 
