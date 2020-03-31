@@ -8,6 +8,7 @@
 # or tonclib's templates ( $(TONCCODE)/lab/template )
 # 
 # grit background.png -gu16 -gB4 -mLs -ftc
+# grit duck.png -gu16 -gB4 -Mw 4 -Mh 4 -ftc
 #
 
 PATH := $(DEVKITARM)/bin:$(PATH)
