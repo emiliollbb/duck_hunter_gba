@@ -6,6 +6,9 @@
 # NOTE: for educational purposes only. For real work, use 
 # devkitPro's templates ( $(DEVKITPRO)/examples/gba/template )
 # or tonclib's templates ( $(TONCCODE)/lab/template )
+# 
+# grit background.png -gu16 -gB4 -mLs -ftc
+#
 
 PATH := $(DEVKITARM)/bin:$(PATH)
 
