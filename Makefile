@@ -10,6 +10,13 @@
 # grit background.png -gu16 -gB4 -mLs -ftc
 # grit duck.png -gu16 -gB4 -Mw 4 -Mh 4 -ftc
 #
+# arm-none-eabi-gcc -I/C/tonc/code/tonclib/include -O2 -Wall -fno-strict-aliasing -mthumb-interwork -mthumb -c duck_hunter.c -o duck_hunter.o
+# arm-none-eabi-gcc -I/C/tonc/code/tonclib/include -O2 -Wall -fno-strict-aliasing -mthumb-interwork -mthumb -c background.c -o background.o
+# arm-none-eabi-gcc -I/C/tonc/code/tonclib/include -O2 -Wall -fno-strict-aliasing -mthumb-interwork -mthumb -c duck.c -o duck.o
+# arm-none-eabi-gcc duck_hunter.o background.o duck.o -mthumb-interwork -mthumb -specs=gba.specs -L/C/tonc/code/tonclib/lib -ltonc -o duck_hunter.elf
+# arm-none-eabi-objcopy -v -O binary duck_hunter.elf duck_hunter.gba
+# gbafix duck_hunter.gba -tduck_hunter
+#
 
 PATH := $(DEVKITARM)/bin:$(PATH)
 
