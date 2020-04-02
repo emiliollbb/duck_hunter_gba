@@ -1,23 +1,3 @@
-#
-# brin_demo.mak
-#
-# makefile for trivial map demo
-#
-# NOTE: for educational purposes only. For real work, use 
-# devkitPro's templates ( $(DEVKITPRO)/examples/gba/template )
-# or tonclib's templates ( $(TONCCODE)/lab/template )
-# 
-# grit background.png -gu16 -gB4 -mLs -ftc
-# grit duck.png -gu16 -gB4 -Mw 4 -Mh 4 -ftc
-#
-# arm-none-eabi-gcc -I/C/tonc/code/tonclib/include -O2 -Wall -fno-strict-aliasing -mthumb-interwork -mthumb -c duck_hunter.c -o duck_hunter.o
-# arm-none-eabi-gcc -I/C/tonc/code/tonclib/include -O2 -Wall -fno-strict-aliasing -mthumb-interwork -mthumb -c background.c -o background.o
-# arm-none-eabi-gcc -I/C/tonc/code/tonclib/include -O2 -Wall -fno-strict-aliasing -mthumb-interwork -mthumb -c duck.c -o duck.o
-# arm-none-eabi-gcc duck_hunter.o background.o duck.o -mthumb-interwork -mthumb -specs=gba.specs -L/C/tonc/code/tonclib/lib -ltonc -o duck_hunter.elf
-# arm-none-eabi-objcopy -v -O binary duck_hunter.elf duck_hunter.gba
-# gbafix duck_hunter.gba -tduck_hunter
-#
-
 PATH := $(DEVKITARM)/bin:$(PATH)
 
 # --- Project details -------------------------------------------------
@@ -31,118 +11,40 @@ LIBPATHS := -L$(LIBTONC)/lib
 
 LIBS    := -ltonc
 
-# ROM, IWRAM, asm sources
-RCSRC   := $(PROJ).c background.c duck.c
-ICSRC   := 
-SSRC    := 
-
-bMB     := 0		# Boot mode: cart/multiboot
-bGENASM := 0		# Generate asm for C files 
-bMAP    := 0		# Generate map file
-
-# === The rest need not be altered (probably) =========================
-
-CSRC    := $(RCSRC) $(ICSRC)
-
-RCOBJ   := $(RCSRC:.c=.o)
-ICOBJ   := $(ICSRC:.c=.o)
-COBJ    := $(RCOBJ) $(ICOBJ)
-SOBJ    := $(SSRC:.s=.o)
-
-OBJ     := $(COBJ) $(SOBJ)
-
-ifeq ($(strip $(bMB)), 1)
-TARGET  := $(PROJ).mb
-SPECS   := -specs=gba_mb.specs
-else
-TARGET  := $(PROJ)
-SPECS   := -specs=gba.specs
-endif
-
-# --- Compiling -------------------------------------------------------
-
 CROSS   ?= arm-none-eabi-
 AS      := $(CROSS)gcc
 CC      := $(CROSS)gcc
 LD      := $(CROSS)gcc
 OBJCOPY := $(CROSS)objcopy
 
-ARCH    := -mthumb-interwork -mthumb
-RARCH   := -mthumb-interwork -mthumb
-IARCH   := -mthumb-interwork -marm
 
-CBASE   := $(INCLUDE) -O2 -Wall -fno-strict-aliasing
-RCFLAGS := $(CBASE) $(RARCH)
-ICFLAGS := $(CBASE) $(IARCH) -mlong-calls
-CFLAGS  := $(RCFLAGS)
+background.c :
+	grit background.png -gu16 -gB4 -mLs -ftc
 
-ASFLAGS := -x assembler-with-cpp  -c -mthumb-interwork
-LDFLAGS := $(ARCH) $(SPECS) $(LIBPATHS) $(LIBS)
+background.o : background.c
+	arm-none-eabi-gcc -I/C/tonc/code/tonclib/include -O2 -Wall -fno-strict-aliasing -mthumb-interwork -mthumb -c background.c -o background.o
 
-ifeq ($(strip $(bMAP)), 1)
-	LDFLAGS += -Wl,-Map,$(PROJ).map
-endif
+duck.c :
+	grit duck.png -gu16 -gB4 -Mw 4 -Mh 4 -ftc
 
-# === TARGETS =========================================================
+duck.o : duck.c
+	arm-none-eabi-gcc -I/C/tonc/code/tonclib/include -O2 -Wall -fno-strict-aliasing -mthumb-interwork -mthumb -c duck.c -o duck.o
 
-.PHONY: build clean
+duck_hunter.o : duck_hunter.c
+	arm-none-eabi-gcc -I/C/tonc/code/tonclib/include -O2 -Wall -fno-strict-aliasing -mthumb-interwork -mthumb -c duck_hunter.c -o duck_hunter.o
 
-# --- Build -----------------------------------------------------------
+duck_hunter.elf : duck_hunter.o background.o duck.o
+	arm-none-eabi-gcc duck_hunter.o background.o duck.o -mthumb-interwork -mthumb -specs=gba.specs -L/C/tonc/code/tonclib/lib -ltonc -o duck_hunter.elf
 
-# --- Main target ---
-build: depends $(TARGET).gba
-	@echo done
+duck_hunter.gba : duck_hunter.elf
+	arm-none-eabi-objcopy -v -O binary duck_hunter.elf duck_hunter.gba
+	gbafix duck_hunter.gba -tduck_hunter
 
-# --- Translation ---
-# ---.elf -> .gba ---
-$(TARGET).gba : $(TARGET).elf
-	@$(OBJCOPY) -v -O binary $< $@
-	-@gbafix $@ -t$(TITLE)
-
-# --- Linking -------------
-# --- *.o *.a -> .elf -----
-$(TARGET).elf : $(OBJ) 
-	$(LD) $^ $(LDFLAGS) -o $@
-
-# --- ROM compilation ---
-# --- *.c -> *.o --------
-$(RCOBJ) : %.o : %.c
-	$(CC) $(RCFLAGS) -c $< -o $@
-ifeq ($(strip $(bGENASM)), 1)
-	$(CC) $(RCFLAGS) -fverbose-asm -S $<
-endif
-
-# --- IWRAM compilation ----
-# *.iwram.c -> *.iwram.o ---
-$(ICOBJ) : %.iwram.o : %.iwram.c
-	$(CC) $(ICFLAGS) -c $< -o $@
-ifeq ($(strip $(bGENASM)), 1)
-	$(CC) $(ICFLAGS) -fverbose-asm -S $<
-endif
-
-# --- Assembling ---
-# --- *.s -> *.o ---
-$(SOBJ) : %.o : %.s
-	$(AS) $(ASFLAGS) -c $< -o $@
-
-# --- Header dependencies ---
-# --- *.c -> .d -------------
-depends:
-	$(CC) -MM $(CFLAGS) -c $(ICSRC) $(RCSRC) > $(PROJ).d
-
--include $(PROJ).d
-
-# --- Build Lib -------------------------------------------------------
-
-buildlib : 
-	$(MAKE) -C $(UDIR) -f tonclib.mak	buildlib
-
-# --- Clean -----------------------------------------------------------
-
-clean : 
-	@rm -fv $(TARGET).gba
-	@rm -fv $(TARGET).elf $(PROJ).map $(PROJ).d
-	@rm -fv $(CSRC:.c=.s)
-	@rm -fv $(OBJ)
-
-#EOF
+clean :
+	rm -f background.c
+	rm -f background.o
+	rm -f duck.c
+	rm -f duck.o
+	rm -f duck_hunter.o
+	rm -f duck_hunter.elf
+	rm -f duck_hunter.gba
