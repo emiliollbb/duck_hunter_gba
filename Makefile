@@ -17,24 +17,26 @@ CC      := $(CROSS)gcc
 LD      := $(CROSS)gcc
 OBJCOPY := $(CROSS)objcopy
 
+all : duck_hunter.gba
+
 
 background.c :
 	grit background.png -gu16 -gB4 -mLs -ftc
 
 background.o : background.c
-	arm-none-eabi-gcc -I/C/tonc/code/tonclib/include -O2 -Wall -fno-strict-aliasing -mthumb-interwork -mthumb -c background.c -o background.o
+	arm-none-eabi-gcc -I${INCLUDE} -O2 -Wall -fno-strict-aliasing -mthumb-interwork -mthumb -c background.c -o background.o
 
 duck.c :
 	grit duck.png -gu16 -gB4 -Mw 4 -Mh 4 -ftc
 
 duck.o : duck.c
-	arm-none-eabi-gcc -I/C/tonc/code/tonclib/include -O2 -Wall -fno-strict-aliasing -mthumb-interwork -mthumb -c duck.c -o duck.o
+	arm-none-eabi-gcc ${INCLUDE} -O2 -Wall -fno-strict-aliasing -mthumb-interwork -mthumb -c duck.c -o duck.o
 
 duck_hunter.o : duck_hunter.c
-	arm-none-eabi-gcc -I/C/tonc/code/tonclib/include -O2 -Wall -fno-strict-aliasing -mthumb-interwork -mthumb -c duck_hunter.c -o duck_hunter.o
+	arm-none-eabi-gcc ${INCLUDE} -O2 -Wall -fno-strict-aliasing -mthumb-interwork -mthumb -c duck_hunter.c -o duck_hunter.o
 
 duck_hunter.elf : duck_hunter.o background.o duck.o
-	arm-none-eabi-gcc duck_hunter.o background.o duck.o -mthumb-interwork -mthumb -specs=gba.specs -L/C/tonc/code/tonclib/lib -ltonc -o duck_hunter.elf
+	arm-none-eabi-gcc duck_hunter.o background.o duck.o -mthumb-interwork -mthumb -specs=gba.specs ${LIBPATHS} -ltonc -o duck_hunter.elf
 
 duck_hunter.gba : duck_hunter.elf
 	arm-none-eabi-objcopy -v -O binary duck_hunter.elf duck_hunter.gba
