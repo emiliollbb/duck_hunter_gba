@@ -8,6 +8,7 @@
 #include <tonc.h>
 
 #include "background.h"
+#include "background2.h"
 #include "duck.h"
 
 #define DUCKS_SIZE 4
@@ -34,6 +35,7 @@ struct game_s {
     struct duck_s ducks[DUCKS_SIZE];
     struct bullet_s bullets[2];
     struct hunter_s hunter;
+    int cloud_pos;
     int objects;
     u32 frame;
 };
@@ -46,6 +48,7 @@ struct game_s game;
 void init_game() {
     int i=0;
     game.objects=0;
+    game.cloud_pos=10;
     
     for(i=0; i<DUCKS_SIZE; i++) {
 		game.ducks[i].x=i*50-200;
@@ -107,6 +110,9 @@ void render_frame() {
         game.hunter.object->attr1 |= ATTR1_HFLIP;
     }
     obj_set_pos(game.hunter.object, game.hunter.x, game.hunter.y);
+    
+    // Clouds scroll
+    REG_BG1HOFS=game.cloud_pos;
 
     oam_copy(oam_mem, obj_buffer, game.objects);
 }
@@ -204,6 +210,12 @@ void update_game() {
                 game.ducks[i].vy=0;
             }
         }
+        
+        // Move clouds
+        if(game.frame%3==0)
+        {
+			game.cloud_pos-=1;
+		}
 }
 
 
@@ -233,12 +245,24 @@ void load_background() {
 	
     // set up BG0 for a 4bpp 64x32t map, using
 	//   using charblock 0 and screenblock 3
-	REG_BG0CNT= BG_CBB(0) | BG_SBB(3) | BG_4BPP | BG_REG_64x32;
+	REG_BG0CNT= BG_CBB(0) | BG_SBB(3) | BG_4BPP | BG_REG_64x32 | BG_PRIO(1);
 	
 	// Backround H scroll
 	REG_BG0HOFS= 0;
     // Background V scroll
 	REG_BG0VOFS= 0;
+	
+	
+	// Load tiles background1 into CBB 1
+	memcpy(&tile_mem[1][0], background2Tiles, background2TilesLen);
+	// Load map background1 into SBB 11
+	memcpy(&se_mem[11][0], background2Map, background2MapLen);
+	// Config background1
+	REG_BG1CNT= BG_CBB(1) | BG_SBB(11) | BG_4BPP | BG_REG_64x32 | BG_PRIO(0);
+	// Backround1 H scroll
+	REG_BG1HOFS=10;
+    // Background1 V scroll
+	REG_BG1VOFS=-15;
 	
 }
 
@@ -263,7 +287,7 @@ int main()
 	load_sprites();
 		
     // Init Display
-    REG_DISPCNT= DCNT_MODE0 | DCNT_BG0 | DCNT_OBJ | DCNT_OBJ_1D;
+    REG_DISPCNT= DCNT_MODE0 | DCNT_BG0 | DCNT_BG1 | DCNT_OBJ | DCNT_OBJ_1D;
     
     
 	init_game();
