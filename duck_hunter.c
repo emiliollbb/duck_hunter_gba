@@ -228,12 +228,12 @@ void load_background() {
 	memcpy(pal_bg_mem, backgroundPal, backgroundPalLen);
 	// Load tiles into CBB 0
 	memcpy(&tile_mem[0][0], backgroundTiles, backgroundTilesLen);
-	// Load map into SBB 30
-	memcpy(&se_mem[30][0], backgroundMap, backgroundMapLen);
+	// Load map into SBB 3
+	memcpy(&se_mem[3][0], backgroundMap, backgroundMapLen);
 	
     // set up BG0 for a 4bpp 64x32t map, using
-	//   using charblock 0 and screenblock 31
-	REG_BG0CNT= BG_CBB(0) | BG_SBB(30) | BG_4BPP | BG_REG_64x32;
+	//   using charblock 0 and screenblock 3
+	REG_BG0CNT= BG_CBB(0) | BG_SBB(3) | BG_4BPP | BG_REG_64x32;
 	
 	// Backround H scroll
 	REG_BG0HOFS= 0;
