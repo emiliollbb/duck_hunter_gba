@@ -60,7 +60,7 @@ void init_game() {
         obj_set_attr(game.ducks[i].object, 
 			ATTR0_SQUARE,
 			ATTR1_SIZE_32,
-			ATTR2_PALBANK(0) | 0);
+			ATTR2_PALBANK(0) | ATTR2_PRIO(1) | 0);
 	}
     
     game.hunter.x=0;
@@ -91,10 +91,10 @@ void render_frame() {
     for(i=0; i<DUCKS_SIZE; i++) {
         // Duck flying
         if(game.ducks[i].vx>0) {
-            game.ducks[i].object->attr2= ATTR2_BUILD(game.frame/16%3*16, i%2, 0);
+            game.ducks[i].object->attr2= ATTR2_BUILD(game.frame/16%3*16, i%2, 1);
         }
         else if(game.ducks[i].vx==0) {
-            game.ducks[i].object->attr2= ATTR2_BUILD(5*16, i%2, 0);
+            game.ducks[i].object->attr2= ATTR2_BUILD(5*16, i%2, 1);
         }
         
         obj_set_pos(game.ducks[i].object, game.ducks[i].x, game.ducks[i].y);
@@ -214,7 +214,7 @@ void update_game() {
         // Move clouds
         if(game.frame%3==0)
         {
-			game.cloud_pos-=1;
+			game.cloud_pos+=1;
 		}
 }
 
