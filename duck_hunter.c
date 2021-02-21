@@ -8,6 +8,7 @@
 #include <tonc.h>
 #include <stdio.h>
 
+#include "version.h"
 #include "background.h"
 #include "background2.h"
 #include "duck.h"
@@ -294,7 +295,7 @@ void run_version() {
 	tte_write("#{P:90,64}PRESENTS");
 	tte_write("#{P:75,100}DUCK HUNTER");
 	tte_write("#{P:0,152}");
-	tte_write("version: 000000");
+	tte_write(VERSION);
 	
 	REG_DISPCNT= DCNT_MODE0 | DCNT_BG3;
 	
