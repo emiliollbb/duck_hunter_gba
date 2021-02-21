@@ -286,13 +286,13 @@ void load_sprites() {
 }
 
 void run_version() {
-	int timeout=100;
+	int timeout=200;
 	pal_bg_bank[1][15]= CLR_WHITE;    
 	tte_write("#{cx:0x1000}");
 	
 	tte_write("#{P:50,16}www.emiliollbb.net");
-	tte_write("#{P:70,64}PRESENTS");
-	tte_write("#{P:50,80}DUCK HUNTER");
+	tte_write("#{P:90,64}PRESENTS");
+	tte_write("#{P:75,100}DUCK HUNTER");
 	
 	REG_DISPCNT= DCNT_MODE0 | DCNT_BG3;
 	
