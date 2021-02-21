@@ -11,9 +11,13 @@ pipeline {
         stage('Version') {
             steps {
                 sh '''
-                    myversion=$(git log -1 | head -1 | sed 's/commit //')
+                    myversion=$(git log -1 --abbrev-commit | head -1 | sed 's/commit //')
+                    begin_date=$(git log --reverse | head -3 | tail -1 | awk '{print $6}')
+                    end_date=$(git log | head -3 | tail -1 | awk '{print $6}')
                     echo $myversion
-                    echo '#define VERSION' $myversion > version.h
+                    echo '#define VERSION' '"Build: '$myversion'"' > version.h
+                    echo '#define BEGIN_DATE' '"'$begin_date'"' >> version.h
+                    echo '#define END_DATE' '"'$end_date'"' >> version.h
                 '''
             }
         }
