@@ -156,6 +156,11 @@ void update_game() {
               game.ducks[j].vx=0;
               game.ducks[j].vy=3;
               game.hunter.score++;
+              // Update score in screen
+              tte_write("#{P:72,151}");
+			  tte_write("#{cx:0x1000}");
+			  tte_write("00");
+              
               game.bullets[i].e=0;
           }
         }
@@ -266,10 +271,9 @@ void load_background() {
 	
 	
 	tte_init_se_default(3, BG_CBB(3)|BG_SBB(30));
-    tte_write("#{P:72,151}");        // Goto (72, 64).
-    tte_write("#{cx:0x1000}");
-    tte_write("00");      // Print "Hello world!"
-	
+	tte_write("#{P:72,151}");
+	tte_write("#{cx:0x1000}");
+	tte_write("00");
 }
 
 void load_sprites() {
