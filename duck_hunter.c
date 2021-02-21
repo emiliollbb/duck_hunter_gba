@@ -159,7 +159,7 @@ void update_game() {
               game.ducks[j].vy=3;
               game.hunter.score++;
               // Update score in screen
-              tte_write("#{P:72,151}");
+              tte_write("#{P:16,152}");
 			  tte_write("#{cx:0x1000}");
 			  sprintf(buffer, "%02u", game.hunter.score);
 			  tte_write(buffer);
@@ -274,7 +274,7 @@ void load_background() {
 	
 	
 	tte_init_se_default(3, BG_CBB(3)|BG_SBB(30));
-	tte_write("#{P:72,151}");
+	tte_write("#{P:16,152}");
 	tte_write("#{cx:0x1000}");
 	tte_write("00");
 }
