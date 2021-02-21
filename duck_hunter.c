@@ -272,8 +272,6 @@ void load_background() {
     // Background1 V scroll
 	REG_BG1VOFS=-15;
 	
-	
-	tte_init_se_default(3, BG_CBB(3)|BG_SBB(30));
 	tte_write("#{P:16,152}");
 	tte_write("#{cx:0x1000}");
 	tte_write("00");
@@ -287,6 +285,25 @@ void load_sprites() {
 	
 }
 
+void run_version() {
+	int timeout=100;
+	pal_bg_bank[1][15]= CLR_WHITE;    
+	tte_write("#{cx:0x1000}");
+	
+	tte_write("#{P:50,16}www.emiliollbb.net");
+	tte_write("#{P:70,64}PRESENTS");
+	tte_write("#{P:50,80}DUCK HUNTER");
+	
+	REG_DISPCNT= DCNT_MODE0 | DCNT_BG3;
+	
+	while(timeout>0)
+	{
+		VBlankIntrWait();
+		timeout--;
+	}
+	tte_write("#{es}");
+}
+
 int main()
 {
 	// Init interrupts, and enable VBlank irq
@@ -294,6 +311,16 @@ int main()
 	irq_add(II_VBLANK, NULL);
 	
 	init_sound();
+	tte_init_se(
+        3,                      // Background number (BG 0)
+        BG_CBB(3)|BG_SBB(30),   // BG control (for REG_BGxCNT)
+        0,                      // Tile offset (special cattr)
+        CLR_YELLOW,             // Ink color
+        14,                     // BitUnpack offset (on-pixel = 15)
+        NULL,                   // Default font (sys8) 
+        NULL);                  // Default renderer (se_drawg_s)
+	
+	run_version();
 	
 	load_background();
 	
