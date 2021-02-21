@@ -1,0 +1,42 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'master',
+                url: 'https://github.com/emiliollbb/duck_hunter_gba.git'
+            }
+        }
+        stage('Version') {
+            steps {
+                sh '''
+                    myversion=$(git log -1 | head -1 | sed 's/commit //')
+                    echo $myversion
+                    echo '#define VERSION' $myversion > version.h
+                '''
+            }
+        }
+        stage('Build') {
+            steps {
+                sh '''
+			export DEVKITPRO=/opt/devkitpro  
+			export LIBTONC=${DEVKITPRO}/libtonc
+			export DEVKITARM=${DEVKITPRO}/devkitARM
+			export PATH=${DEVKITPRO}/tools/bin:$PATH
+			make clean
+			make all
+                '''
+            }
+        }
+        stage('Deploy') {
+            steps {
+            	sh '''
+			echo 'Deploy...'
+            		#scp duck_hunter.gba pi@www.example.com:/var/www/roms/duck_hunter.gba
+            	'''
+            }
+        }
+        
+    }
+}
