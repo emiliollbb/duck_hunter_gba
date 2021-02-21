@@ -6,6 +6,7 @@
 
 #include <string.h>
 #include <tonc.h>
+#include <stdio.h>
 
 #include "background.h"
 #include "background2.h"
@@ -119,6 +120,7 @@ void render_frame() {
 
 void update_game() {
     int i,j;
+    char buffer[10];
     // move left/right
 		game.hunter.x += 2*key_tri_horz();
 		if(game.frame%2) {
@@ -159,7 +161,8 @@ void update_game() {
               // Update score in screen
               tte_write("#{P:72,151}");
 			  tte_write("#{cx:0x1000}");
-			  tte_write("00");
+			  sprintf(buffer, "%02u", game.hunter.score);
+			  tte_write(buffer);
               
               game.bullets[i].e=0;
           }
